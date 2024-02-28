@@ -32,7 +32,7 @@ body {
   }
 }
 
-.l2r {
+.r2l {
     writing-mode: vertical-rl;
-    text-orientation: upright;
+    direction: rtl;
 }

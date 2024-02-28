@@ -10,7 +10,12 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.2.1",
+    "@mdx-js/loader": "^3.0.1",
+    "@mdx-js/react": "^3.0.1",
+    "@next/mdx": "^14.1.0",
+    "@types/mdx": "^2.0.11",
     "dayjs": "^1.11.10",
+    "firebase": "^10.8.0",
     "next": "14.1.0",
     "react": "^18",
     "react-dom": "^18",

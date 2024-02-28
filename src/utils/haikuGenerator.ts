@@ -9,6 +9,9 @@ if (!GOOGLE_API_KEY) {
   throw new Error("GOOGLE_API_KEY is not set");
 }
 
+import type { BasicHaiku } from "./types";
+import { BasicHaikuSchema } from "./types";
+
 export const generateHaiku = async (topic: string) => {
   const generativeAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
   const model = await generativeAI.getGenerativeModel({
@@ -68,19 +71,25 @@ Aim for a 5-7-5 syllable count and include a surprise or twist at the end.
 Please output the Senry in the shape of a JSON object with the schema containing one property called "senryu" containing the senryu in Japanese, 
 "reading" with the reading in English, and "en" with an English translation.
 
-** Output Examples **
-Some examples of output are:
-input: drink etiquette
-output:
+** Examples **
+Some examples of desired behaviour are:
+**input**:
+drink etiquette
+**output**:
 { "senryu": "飲み会で\\n空気が読める\\nいい上司" ,
   "reading": "Nomikaide \\n kuuki wo yomeru \\n ii joshi",
   "en": "At a drinking party\\nThe one who can read the air\\n Is a good boss"}
 
-  input: politicians
-  output:
-  { "senryu": "政治家も\\n私も嘘が\\n下手である",
+**input**: politicians
+**output**:
+{ "senryu": "政治家も\\n私も嘘が\\n下手である",
     "reading": "seijika mo \\n watashi mo uso ga \\n heta de aru",
-    "en": "Politicians as well \\n Like me \\n Are bad at lying"}`,
+    "en": "Politicians as well \\n Like me \\n Are bad at lying"
+}
+
+**Task Input**: ${topic}
+**Task Output**:
+`,
     },
   ];
 
@@ -92,9 +101,31 @@ output:
   const response = result.response;
   const text = response.text();
 
-  console.log(`Generated Haiku: ${text}`);
-
-  return text;
+  console.log(`Generated Haiku: ${text}\n-=-=-=-=-=-=-=`);
+  try {
+    // Sometimes the AI generates triple-backquotes with JSON before
+    // so we will use a regex to extract the actual JSON-object string
+    const extractJSONregex = /\{(?:.*\n)*\}/g;
+    const match = extractJSONregex.exec(text);
+    if (!match) {
+      console.error("No JSON-object found in the response");
+      return undefined;
+    }
+    const parsedText = JSON.parse(match[0]);
+    const zodParseResult = BasicHaikuSchema.safeParse(parsedText);
+    // we add the topic in the return object so that we can connect the haiku with the meta-data
+    if (zodParseResult.success) {
+      const haiku = zodParseResult.data;
+      return { ...haiku, topic };
+    } else {
+      console.error(`Error parsing haiku: ${zodParseResult.error}`);
+      return undefined;
+    }
+  } catch (e) {
+    // TODO Test if this is a ZodError -> maybe
+    console.error(e);
+    return undefined;
+  }
 };
 
 export default generateHaiku;
