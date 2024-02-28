@@ -4,8 +4,8 @@
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+--background-start-rgb: 254, 236, 226;
+    --background-end-rgb: 247, 222, 208;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -30,4 +30,9 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+.l2r {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
 }
