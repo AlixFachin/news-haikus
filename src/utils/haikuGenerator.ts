@@ -99,10 +99,10 @@ drink etiquette
   });
 
   const response = result.response;
-  const text = response.text();
-
-  console.log(`Generated Haiku: ${text}\n-=-=-=-=-=-=-=`);
   try {
+    const text = response.text();
+
+    console.log(`Generated Haiku: ${text}\n-=-=-=-=-=-=-=`);
     // Sometimes the AI generates triple-backquotes with JSON before
     // so we will use a regex to extract the actual JSON-object string
     const extractJSONregex = /\{(?:.*\n)*\}/g;

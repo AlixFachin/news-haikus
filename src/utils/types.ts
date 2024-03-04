@@ -11,7 +11,7 @@ export const HaikuDBSchema = zod.object({
   classification: zod.number(),
 });
 
-export type Haiku = zod.infer<typeof HaikuDBSchema>;
+export type Haiku = zod.infer<typeof HaikuDBSchema> & { id: string };
 
 // BasicHaiku will represent the type returned by the generative model
 export const BasicHaikuSchema = zod.object({

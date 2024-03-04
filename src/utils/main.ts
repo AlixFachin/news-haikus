@@ -31,7 +31,9 @@ export async function getHaikus(date: Date) {
   const todayHaikus = await fetchHaikusFromFirebase(date);
   if (todayHaikus.length > 0) {
     console.log(`Today's haikus were already generated`);
-    console.log(`Today's haikus: ${todayHaikus}`);
+    console.log(
+      `Today's haikus: ${todayHaikus.map((haiku) => JSON.stringify(haiku))}`,
+    );
     return todayHaikus;
   }
 
@@ -65,16 +67,22 @@ export async function getHaikus(date: Date) {
   // (e.g. top 3 plus random 2 in the remaining 7?)
   // and check that the article was not already used in a previous day
 
-  const haikus = await Promise.all(
-    newsWithTopics.slice(0, 5).map((news) => generateHaiku(news.topic)),
+  let haikus = await Promise.all(
+    newsWithTopics.slice(0, 3).map((news) => generateHaiku(news.topic)),
   );
+  haikus = [
+    ...haikus,
+    ...(await Promise.all(
+      newsWithTopics.slice(0, 3).map((news) => generateHaiku(news.webTitle)),
+    )),
+  ];
 
-  const EnrichedHaikusList: Haiku[] = [];
+  const EnrichedHaikusList: Omit<Haiku, "id">[] = [];
 
   haikus.forEach((haiku) => {
     if (haiku) {
       const correspondingNews = newsWithTopics.find(
-        (news) => news.topic === haiku.topic,
+        (news) => haiku.topic === news.topic || haiku.topic === news.webTitle,
       );
       if (correspondingNews) {
         EnrichedHaikusList.push({
@@ -89,9 +97,9 @@ export async function getHaikus(date: Date) {
   });
 
   // Now we have to store the haikus in the database, and return them
-  await storeHaikusInFirebase(EnrichedHaikusList);
+  const haikuWithIdList = await storeHaikusInFirebase(EnrichedHaikusList);
 
-  return EnrichedHaikusList;
+  return haikuWithIdList.filter((haiku) => !!haiku);
 }
 
 export default getHaikus;

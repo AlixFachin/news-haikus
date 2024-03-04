@@ -8,6 +8,8 @@ import {
   query,
   where,
   addDoc,
+  doc,
+  getDoc,
 } from "firebase/firestore";
 import type { Haiku } from "@/utils/types";
 import { HaikuDBSchema } from "@/utils/types";
@@ -66,13 +68,57 @@ export async function fetchHaikusFromFirebase(date: Date) {
   querySnapshot.forEach((doc) => {
     console.log(`Found ${doc.data()}`);
     const haiku = HaikuDBSchema.parse(doc.data());
-    result.push(haiku);
+    result.push({ ...haiku, id: doc.id });
   });
 
   return result;
 }
 
-export async function storeHaikusInFirebase(haikus: Haiku[]) {
+export async function fetchOneHaikuFromFirebase(haikuId: string) {
+  const auth = getAuth(app);
+  if (!auth.currentUser) {
+    await loginToFirebase();
+  }
+
+  const db = getFirestore(app);
+  const haikuDocRef = doc(db, "haikus", haikuId);
+  const haikuDoc = await getDoc(haikuDocRef);
+
+  if (!haikuDoc.exists()) {
+    console.error(`Document not found for haikuId: ${haikuId}`);
+    return undefined;
+  }
+
+  try {
+    const haiku = HaikuDBSchema.parse(haikuDoc.data());
+    return haiku;
+  } catch (e) {
+    console.error(`Error parsing haiku: ${e}`);
+    return undefined;
+  }
+}
+
+export async function getAllHaikuIdsFromFirebase() {
+  const result: string[] = [];
+
+  const auth = getAuth(app);
+  if (!auth.currentUser) {
+    await loginToFirebase();
+  }
+
+  const db = getFirestore(app);
+  const allHaikus = await getDocs(collection(db, "haikus"));
+
+  allHaikus.forEach((doc) => {
+    result.push(doc.id);
+  });
+
+  return result;
+}
+
+export async function storeHaikusInFirebase(
+  haikus: Omit<Haiku, "id">[],
+): Promise<Haiku[]> {
   const auth = getAuth(app);
   if (!auth.currentUser) {
     await loginToFirebase();
@@ -81,5 +127,18 @@ export async function storeHaikusInFirebase(haikus: Haiku[]) {
   const db = getFirestore(app);
   const haikusRef = collection(db, "haikus");
 
-  await Promise.all(haikus.map((haiku) => addDoc(haikusRef, haiku)));
+  return Promise.all(
+    haikus.map(async (haiku) => {
+      const docRef = await addDoc(haikusRef, haiku);
+      const doc = await getDoc(docRef);
+      if (!doc.exists()) {
+        console.error(`Error storing haiku: ${JSON.stringify(haiku)}`);
+        return undefined;
+      }
+      return { ...haiku, id: doc.id };
+    }),
+  ).then((haikus) =>
+    // Note that we use a type predicate to tell Typescript that all 'undefined' values will be filtered out
+    haikus.filter((haiku): haiku is Haiku => !!haiku),
+  );
 }
