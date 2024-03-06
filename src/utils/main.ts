@@ -32,7 +32,7 @@ export async function getHaikus(date: Date) {
   if (todayHaikus.length > 0) {
     console.log(`Today's haikus were already generated`);
     console.log(
-      `Today's haikus: ${todayHaikus.map((haiku) => JSON.stringify(haiku))}`,
+      `Today's haikus: ${todayHaikus.map((haiku) => haiku.articleTitle).join("\n")}`,
     );
     return todayHaikus;
   }

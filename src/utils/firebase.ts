@@ -66,7 +66,6 @@ export async function fetchHaikusFromFirebase(date: Date) {
   const querySnapshot = await getDocs(q);
 
   querySnapshot.forEach((doc) => {
-    console.log(`Found ${doc.data()}`);
     const haiku = HaikuDBSchema.parse(doc.data());
     result.push({ ...haiku, id: doc.id });
   });

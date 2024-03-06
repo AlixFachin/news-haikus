@@ -5,6 +5,7 @@ import {
 } from "@/utils/firebase";
 import { notFound } from "next/navigation";
 import dayjs from "dayjs";
+import Link from "next/link";
 
 /**
  * generateStaticParams is useful for generating static paths for all HaikuIDs.
@@ -26,19 +27,27 @@ export default async function HaikuDetailPage({
   }
 
   return (
-    <main className=" min-h-screen sm:p-4 xl:p-24">
-      <h1 className="text-xl font-bold">{haiku.topic}</h1>
-      <section className="w-[400px] bg-gradient-to-br from-orange-500 to-yellow-600 p-4">
-        <HaikuCard japaneseHaiku={haiku.senryu} />
-        <ul>
-          <li>{dayjs(haiku.date).format("DD-MMM-YY")}</li>
-          <li>
-            The original article title is:{" "}
-            <a href={haiku.articleUrl}>{haiku.articleTitle}</a>
-          </li>
-          <li>English Reading: {haiku.reading}</li>
-          <li>English Translation: {haiku.en}</li>
-        </ul>
+    <main className="flex min-h-screen flex-col items-center justify-evenly sm:p-4 xl:p-24">
+      <section className="flex w-[400px] flex-col items-start justify-start rounded-xl bg-gradient-to-br p-4 dark:from-blue-900 dark:to-blue-700">
+        <div className="mb-2 self-end p-2 font-light">
+          {dayjs(haiku.date).format("DD-MMM-YY")}
+        </div>
+        <div className="mb-4 self-center text-center text-xl font-light">
+          <a href={haiku.articleUrl}>{haiku.articleTitle}</a>
+        </div>
+        <div className="mb-2 self-center">
+          <HaikuCard japaneseHaiku={haiku.senryu} />
+        </div>
+        <div className="mb-2">Reading: {haiku.reading}</div>
+        <div className="mb-2">Translation: {haiku.en}</div>
+        <div className="flex w-full items-center justify-center">
+          <Link
+            href="/"
+            className="rounded-md bg-blue-950 p-2 text-sm shadow-sm"
+          >
+            Back
+          </Link>
+        </div>
       </section>
     </main>
   );
