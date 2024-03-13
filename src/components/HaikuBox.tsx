@@ -13,7 +13,7 @@ const MinchoFont = Sawarabi_Mincho({
 export const HaikuBox = (haikuData: Haiku) => {
   return (
     <div
-      className={`m-4 flex w-[316px] flex-col items-stretch justify-start rounded-lg  bg-gradient-to-tl p-2 shadow-md dark:from-blue-900 dark:to-blue-700`}
+      className={`m-4 flex w-[316px] flex-col items-stretch justify-start rounded-lg  bg-gradient-to-tl  from-orange-200 to-orange-300 p-2 shadow-md dark:from-blue-900 dark:to-blue-700`}
     >
       <div className="mb-2 w-full py-2 text-center">
         {dayjs(haikuData.date).format("DD-MMM-YY")}
@@ -22,7 +22,7 @@ export const HaikuBox = (haikuData: Haiku) => {
         <HaikuCard japaneseHaiku={haikuData.senryu} />
       </Link>
 
-      <div className="flex-grow rounded-lg p-2 text-sm shadow-md">
+      <div className="flex-grow rounded-lg p-2 text-sm">
         {haikuData.articleTitle}
       </div>
     </div>

@@ -93,21 +93,21 @@ of this article, and a "topic" property containing a string with space-separated
   });
 
   const response = result.response;
-  const text = response.text();
-
-  //   console.log(`Generated News Topics: ${text}`);
-
   try {
+    const text = response.text();
     const topicObject = JSON.parse(text);
     const topicObjectSafe = topicSchema.parse(topicObject);
     return topicObjectSafe;
   } catch (e) {
-    console.error(`Failed to parse the response: ${text}`);
-    const zodError = e as ZodError;
-    for (const issue of zodError.issues) {
-      console.error(issue);
+    console.error(
+      `Failed to parse the response when extracting topics from titles: ${e}`,
+    );
+    if (e instanceof ZodError) {
+      const zodError = e as ZodError;
+      for (const issue of zodError.issues) {
+        console.error(issue);
+      }
     }
-
     return titles.map((title) => ({
       title: title,
       classification: 5,
