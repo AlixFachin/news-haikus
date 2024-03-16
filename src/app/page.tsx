@@ -7,7 +7,7 @@ export default async function Home() {
 
   return (
     <main className="flex min-h-screen flex-col flex-wrap items-center justify-evenly sm:p-4 xl:p-24">
-      <h1 className="text-4xl font-bold sm:text-6xl">Today's Haikus</h1>
+      <h1 className="text-4xl font-bold sm:text-6xl">Today&apos;s Haikus</h1>
       <section>
         {<HaikuContainer haikuList={haikuList.filter((haiku) => !!haiku)} />}
       </section>

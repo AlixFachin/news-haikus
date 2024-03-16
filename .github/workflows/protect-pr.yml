@@ -4,6 +4,8 @@ on: [pull_request, push]
 jobs:
   run-linter:
     runs-on: ubuntu-latest
+    env:
+      HUSKY: 0
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
