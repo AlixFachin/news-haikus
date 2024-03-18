@@ -9,7 +9,7 @@ export const HaikuCard = ({ japaneseHaiku }: { japaneseHaiku: string }) => {
   };
 
   return (
-    <div className="flex h-[400px] w-[300px] items-stretch justify-stretch backdrop-blur-md">
+    <div className="flex h-[400px] w-[300px] select-none items-stretch justify-stretch backdrop-blur-md">
       <div
         className={
           "r2l box-border flex h-full w-full flex-col justify-evenly rounded-sm  p-4 text-4xl shadow-md"

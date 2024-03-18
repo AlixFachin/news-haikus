@@ -30,33 +30,40 @@ export default async function HaikuDetailPage({
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-evenly sm:p-4 xl:p-24">
-      <section className="flex w-[400px] flex-col items-start justify-start rounded-xl bg-gradient-to-br from-orange-200 to-orange-300 p-4 dark:from-blue-900 dark:to-blue-700">
+      <section className="flex max-w-[850px] flex-col items-start justify-start rounded-xl bg-gradient-to-br from-orange-200 to-orange-300 p-4 dark:from-blue-900 dark:to-blue-700">
         <div className="mb-2 self-end p-2 font-light">
           {dayjs(haiku.date).format("DD-MMM-YY")}
         </div>
-        <div className="mb-4 self-center text-center text-xl font-light">
+        <h1 className="mb-4 self-center px-4 text-center text-xl font-light md:mb-8">
           <a href={haiku.articleUrl}>{haiku.articleTitle}</a>
+        </h1>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="mb-2 max-w-[430px] self-center">
+            <HaikuCard japaneseHaiku={haiku.senryu} />
+          </div>
+          <div className="flex flex-col items-start justify-start">
+            <div className="mb-2">
+              <h2 className="font-semibold">Reading</h2>
+              {haiku.reading.split("\n").map((readingLine, index) => (
+                <p className="ml-4" key={`readingLine-${index}`}>
+                  {readingLine}
+                </p>
+              ))}
+            </div>
+            <div className="mb-2">
+              <h2 className="font-semibold">Translation</h2>
+              {haiku.en.split("\n").map((enLine, index) => (
+                <p className="ml-4" key={`enLine-${index}`}>
+                  {enLine}
+                </p>
+              ))}
+            </div>
+            <div className="mb-2">
+              <h2 className="font-semibold">Topic</h2>
+              <p className="ml-4">{haiku.topic}</p>
+            </div>
+          </div>
         </div>
-        <div className="mb-2 self-center ">
-          <HaikuCard japaneseHaiku={haiku.senryu} />
-        </div>
-        <div className="mb-2">
-          Reading:{" "}
-          {haiku.reading.split("\n").map((readingLine, index) => (
-            <p className="ml-4" key={`readingLine-${index}`}>
-              {readingLine}
-            </p>
-          ))}
-        </div>
-        <div className="mb-2">
-          Translation:{" "}
-          {haiku.en.split("\n").map((enLine, index) => (
-            <p className="ml-4" key={`enLine-${index}`}>
-              {enLine}
-            </p>
-          ))}
-        </div>
-        <div className="mb-2">Topic: {haiku.topic}</div>
         <div className="flex w-full items-center justify-center">
           <Link
             href="/"
