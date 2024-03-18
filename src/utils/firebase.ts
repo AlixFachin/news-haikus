@@ -5,6 +5,7 @@ import {
   getFirestore,
   getDocs,
   collection,
+  getCountFromServer,
   query,
   where,
   addDoc,
@@ -71,6 +72,22 @@ export async function fetchHaikusFromFirebase(date: Date) {
   });
 
   return result;
+}
+
+export async function fetchHaikuCountFromFirebase(date: Date) {
+  const auth = getAuth(app);
+  if (!auth.currentUser) {
+    await loginToFirebase();
+  }
+
+  const db = getFirestore(app);
+  const q = query(
+    collection(db, "haikus"),
+    where("date", "==", dayjs(date).format("YYYYMMDD")),
+  );
+
+  const haikuCount = await getCountFromServer(q);
+  return haikuCount.data().count;
 }
 
 export async function fetchOneHaikuFromFirebase(haikuId: string) {

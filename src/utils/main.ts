@@ -13,6 +13,7 @@
 
 import dayjs from "dayjs";
 import {
+  fetchHaikuCountFromFirebase,
   fetchHaikusFromFirebase,
   loginToFirebase,
   storeHaikusInFirebase,
@@ -25,20 +26,14 @@ import type { Haiku } from "./types";
 type NewsWithTopic = Awaited<ReturnType<typeof getNews>>[number] &
   Omit<Awaited<ReturnType<typeof extractTopicFromTitles>>[number], "title">;
 
-export async function getHaikus(date: Date) {
-  await loginToFirebase();
-
-  const todayHaikus = await fetchHaikusFromFirebase(date);
-  if (todayHaikus.length > 0) {
-    console.log(`Today's haikus were already generated`);
-    console.log(
-      `Today's haikus: ${todayHaikus.map((haiku) => haiku.articleTitle).join("\n")}`,
-    );
-    return todayHaikus;
-  }
-
-  console.log(`Today's haikus were not generated yet, generating...`);
-
+/**
+ * Haiku List generation process:
+ * 1. Fetch the latest news
+ * 2. Extract the topics from the news titles
+ * 3. Generate haikus from the topics
+ * @returns {Promise<Haiku[]>} The list of haikus generated
+ */
+async function generateAllHaikus(date: Date) {
   const latestNews = await getNews();
   console.log(`Latest news: ${JSON.stringify(latestNews)}`);
 
@@ -96,10 +91,49 @@ export async function getHaikus(date: Date) {
     }
   });
 
+  return EnrichedHaikusList;
+}
+
+export async function getHaikus(date: Date) {
+  await loginToFirebase();
+
+  const todayHaikus = await fetchHaikusFromFirebase(date);
+  if (todayHaikus.length > 0) {
+    console.log(`Today's haikus were already generated`);
+    console.log(
+      `Today's haikus: ${todayHaikus.map((haiku) => haiku.articleTitle).join("\n")}`,
+    );
+    return todayHaikus;
+  }
+
+  console.log(`Today's haikus were not generated yet, generating...`);
+  const enrichedHaikusList = await generateAllHaikus(date);
   // Now we have to store the haikus in the database, and return them
-  const haikuWithIdList = await storeHaikusInFirebase(EnrichedHaikusList);
+  const haikuWithIdList = await storeHaikusInFirebase(enrichedHaikusList);
 
   return haikuWithIdList.filter((haiku) => !!haiku);
+}
+
+/**
+ * Check if haikus for a specific date were generated. If not, generates them.
+ * This method doesn't return the actual haiku list, so it will prevent excessive data transfer
+ * out of firebase in the case the API route is called too much.
+ * @param date the date for which we want to generate the haikus
+ */
+export async function generateHaikusIfNeeded(date: Date) {
+  await loginToFirebase();
+
+  const todayHaikuCount = await fetchHaikuCountFromFirebase(date);
+  if (todayHaikuCount > 0) {
+    console.log(`Today's haikus were already generated`);
+    return;
+  }
+  // If we didn't generate the haikus yet, we will generate them
+  console.log(`Today's haikus were not generated yet, generating...`);
+  const enrichedHaikusList = await generateAllHaikus(date);
+  // Now we have to store the haikus in the database, and return them
+  const haikuWithIdList = await storeHaikusInFirebase(enrichedHaikusList);
+  return;
 }
 
 export default getHaikus;
