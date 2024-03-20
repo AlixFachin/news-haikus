@@ -26,8 +26,6 @@ export default async function HaikuDetailPage({
     notFound();
   }
 
-  console.log(JSON.stringify(haiku));
-
   return (
     <main className="flex min-h-screen flex-col items-center justify-evenly sm:p-4 xl:p-24">
       <section className="flex max-w-[850px] flex-col items-start justify-start rounded-xl bg-gradient-to-br from-orange-200 to-orange-300 p-4 dark:from-blue-900 dark:to-blue-700">

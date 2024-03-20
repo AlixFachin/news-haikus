@@ -1,9 +1,13 @@
 import { HaikuContainer } from "@/components/HaikuContainer";
-import { getHaikus } from "@/utils/main";
+import { getOrCreateHaikus } from "@/utils/main";
 import dayjs from "dayjs";
 
+// Setting the page revalidation cache options
+// See https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config
+export const revalidate = 0;
+
 export default async function Home() {
-  const haikuList = await getHaikus(dayjs().toDate());
+  const haikuList = await getOrCreateHaikus(dayjs().toDate());
 
   return (
     <main className="flex min-h-screen flex-col flex-wrap items-center justify-evenly sm:p-4 xl:p-24">

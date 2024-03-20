@@ -9,7 +9,6 @@ if (!GOOGLE_API_KEY) {
   throw new Error("GOOGLE_API_KEY is not set");
 }
 
-import type { BasicHaiku } from "./types";
 import { BasicHaikuSchema } from "./types";
 
 export const generateHaiku = async (topic: string) => {
@@ -102,13 +101,13 @@ drink etiquette
   try {
     const text = response.text();
 
-    console.log(`Generated Haiku: ${text}\n-=-=-=-=-=-=-=`);
+    console.log(`Haiku Generator: generated Haiku: ${text}\n-=-=-=-=-=-=-=`);
     // Sometimes the AI generates triple-backquotes with JSON before
     // so we will use a regex to extract the actual JSON-object string
     const extractJSONregex = /\{(?:.*\n)*\}/g;
     const match = extractJSONregex.exec(text);
     if (!match) {
-      console.error("No JSON-object found in the response");
+      console.error("No JSON-object found in the AI response");
       return undefined;
     }
     const parsedText = JSON.parse(match[0]);
@@ -118,11 +117,13 @@ drink etiquette
       const haiku = zodParseResult.data;
       return { ...haiku, topic };
     } else {
-      console.error(`Error parsing haiku: ${zodParseResult.error}`);
+      console.error(
+        `Haiku Generator - Error parsing haiku: ${zodParseResult.error}`,
+      );
       return undefined;
     }
   } catch (e) {
-    // TODO Test if this is a ZodError -> maybe
+    // TODO Test if this is a ZodError
     console.error(e);
     return undefined;
   }

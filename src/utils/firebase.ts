@@ -35,7 +35,9 @@ export async function loginToFirebase() {
   const auth = getAuth(app);
 
   if (auth.currentUser?.uid == process.env.FIREBASE_UID) {
-    console.log(`Already logged in as ${auth.currentUser?.email}`);
+    console.log(
+      `FIREBASE AUTH: Already logged in as ${auth.currentUser?.email}`,
+    );
     return;
   }
 
@@ -48,7 +50,7 @@ export async function loginToFirebase() {
 
   const userCredentials = await signInWithEmailAndPassword(auth, fbUser, fbPwd);
   const user = userCredentials.user;
-  console.log(`User = ${user.email}`);
+  console.log(`FIREBASE AUTH: User = ${user.email}`);
 }
 
 export async function fetchHaikusFromFirebase(date: Date) {
@@ -109,7 +111,9 @@ export async function fetchOneHaikuFromFirebase(haikuId: string) {
     const haiku = HaikuDBSchema.parse(haikuDoc.data());
     return haiku;
   } catch (e) {
-    console.error(`Error parsing haiku: ${e}`);
+    console.error(
+      `FetchOneHaikuFromDB: Error parsing haiku ${haikuId}:\n The Haiku data was: ${JSON.stringify(haikuDoc.data())}\n The error is: ${e}`,
+    );
     return undefined;
   }
 }
