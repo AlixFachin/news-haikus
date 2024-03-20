@@ -53,6 +53,11 @@ export async function loginToFirebase() {
   console.log(`FIREBASE AUTH: User = ${user.email}`);
 }
 
+/**
+ * returns the list of haikus for a given date
+ * @param date the date for which to fetch the haikus
+ * @returns
+ */
 export async function fetchHaikusFromFirebase(date: Date) {
   const result: Haiku[] = [];
 
@@ -76,6 +81,11 @@ export async function fetchHaikusFromFirebase(date: Date) {
   return result;
 }
 
+/**
+ * returns the number of haikus in a database for a given date
+ * @param date the date for which to fetch the haikus
+ * @returns the number of haikus
+ */
 export async function fetchHaikuCountFromFirebase(date: Date) {
   const auth = getAuth(app);
   if (!auth.currentUser) {
@@ -117,7 +127,10 @@ export async function fetchOneHaikuFromFirebase(haikuId: string) {
     return undefined;
   }
 }
-
+/**
+ * Returns the list of haikuIds parameters used by Next to generate static pages at build time
+ * @returns string[]
+ */
 export async function getAllHaikuIdsFromFirebase() {
   const result: string[] = [];
 
@@ -136,6 +149,11 @@ export async function getAllHaikuIdsFromFirebase() {
   return result;
 }
 
+/**
+ * Stores the haikus in the Firebase database
+ * @param haikus the list of haikus to store
+ * @returns the list of haikus with their ids
+ */
 export async function storeHaikusInFirebase(
   haikus: Omit<Haiku, "id">[],
 ): Promise<Haiku[]> {

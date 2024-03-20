@@ -11,7 +11,7 @@ export default function GeneratePage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-evenly p-24">
       <h1 className="text-6xl font-bold">Generate a Haiku</h1>
-      <section>{/* <HaikuContainer /> */}</section>
+      <section></section>
     </main>
   );
 }

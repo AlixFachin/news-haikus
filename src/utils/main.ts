@@ -102,9 +102,10 @@ async function generateAllHaikus(date: Date) {
  * Fetches today's haikus from the database if they were already generated
  * If not, will generate today's haikus and store them in the database
  * @param date the date for which we want to generate the haikus
+ * @param shouldGenerate if true, will generate the haikus if they were not already generated
  * @returns {Promise<Haiku[]>} The list of haikus generated
  */
-export async function getOrCreateHaikus(date: Date) {
+export async function getOrCreateHaikus(date: Date, shouldGenerate: boolean) {
   await loginToFirebase();
 
   const todayHaikus = await fetchHaikusFromFirebase(date);
@@ -115,7 +116,12 @@ export async function getOrCreateHaikus(date: Date) {
     );
     return todayHaikus;
   }
-
+  if (!shouldGenerate) {
+    console.log(
+      `getOrCreateHaikus: Today's haikus were not generated yet, and should not be generated`,
+    );
+    return [];
+  }
   console.log(
     `getOrCreateHaikus: Today's haikus were not generated yet, generating...`,
   );
