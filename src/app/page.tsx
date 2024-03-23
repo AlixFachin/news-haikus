@@ -2,6 +2,7 @@ import { DayHaikuContainer } from "@/components/HaikuContainer";
 import { Suspense } from "react";
 import Spinner from "@/components/Spinner";
 import DateSwitcher from "@/components/DateSwitcher";
+import { HomeDisclaimer } from "@/components/HomeDisclaimer";
 
 // Setting the page revalidation cache options
 // See https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config
@@ -15,6 +16,7 @@ export default function Home() {
       <h1 className="mb-4 text-4xl font-bold sm:text-6xl md:mb-8">
         Today&apos;s Haikus
       </h1>
+      <HomeDisclaimer />
       <section>
         <Suspense fallback={<Spinner />}>
           {<DayHaikuContainer shouldGenerate={true} haikuDate={todayDate} />}
