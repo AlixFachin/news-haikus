@@ -22,72 +22,79 @@ import generateHaiku from "./haikuGenerator";
 import { getNews } from "./news";
 import { extractTopicFromTitles } from "./NewsClassifier";
 import type { Haiku } from "./types";
+import { get } from "http";
 
 type NewsWithTopic = Awaited<ReturnType<typeof getNews>>[number] &
   Omit<Awaited<ReturnType<typeof extractTopicFromTitles>>[number], "title">;
+
+type RawHaiku = Awaited<ReturnType<typeof generateHaiku>>;
+
+/**
+ * Function will return an array containing the first n numbers shuffled in a random way
+ * @param length desired length of the array
+ * @returns array containing the first n numbers shuffled in a random way
+ */
+function getRandomArray(length: number) {
+  const index_array = [];
+  for (let i = 0; i < length; i++) {
+    index_array.push({
+      index: i,
+      pivot: Math.floor(Math.random() * length * 2),
+    });
+  }
+  index_array.sort((a, b) => a.pivot - b.pivot);
+
+  return index_array.map((element) => element.index);
+}
 
 /**
  * Haiku List generation process:
  * 1. Fetch the latest news
  * 2. Extract the topics from the news titles
  * 3. Generate haikus from the topics
+ * @param date the date for which we want to generate the haikus
+ * @param count the number of haikus to generate
  * @returns {Promise<Haiku[]>} The list of haikus generated
  */
-async function generateAllHaikus(date: Date) {
+async function generateHaikuList(date: Date, count: number) {
+  //TODO: Extract the news download into its separate function + separate DB so that
+  // the regularly times cron can be split into two functions.
   const latestNews = await getNews();
   console.log(
     `generateAllHaikus - Output of News Download:\n ${JSON.stringify(latestNews)}`,
   );
 
-  const topics = await extractTopicFromTitles(
-    latestNews.map((news) => news.webTitle),
+  const indexList = getRandomArray(latestNews.length);
+
+  const haikuList = await indexList.reduce(
+    (currentPromise, index) =>
+      currentPromise.then((currentHaikuList) => {
+        if (currentHaikuList.length >= count) {
+          return currentHaikuList;
+        }
+        const news = latestNews[indexList[index]];
+        return generateHaiku(news.webTitle).then((haiku) => {
+          if (haiku) {
+            return [...currentHaikuList, haiku];
+          }
+          return currentHaikuList;
+        });
+      }),
+    Promise.resolve<RawHaiku[]>([]),
   );
-  topics.sort((a, b) => b.classification - a.classification);
-  console.log(`generateAllHaikus - Today's topics: ${JSON.stringify(topics)}`);
-
-  const newsWithTopics: NewsWithTopic[] = [];
-  topics.forEach((topic) => {
-    const relatedNews = latestNews.find(
-      (news) => news.webTitle === topic.title,
-    );
-    if (relatedNews) {
-      newsWithTopics.push({
-        ...relatedNews,
-        topic: topic.topic,
-        classification: topic.classification,
-      });
-    }
-  });
-
-  // For now let's generate haikus with the top 5 topics.
-  // After a while we will find a better way to generate haikus
-  // (e.g. top 3 plus random 2 in the remaining 7?)
-  // and check that the article was not already used in a previous day
-  // TODO -> Change the order of the topics generated
-
-  let haikus = await Promise.all(
-    newsWithTopics.slice(0, 3).map((news) => generateHaiku(news.topic)),
-  );
-  // TEMPORARY EXPERIMENT: Generate haikus from the news titles instead of the topics
-  haikus = [
-    ...haikus,
-    ...(await Promise.all(
-      newsWithTopics.slice(0, 3).map((news) => generateHaiku(news.webTitle)),
-    )),
-  ];
 
   const EnrichedHaikusList: Omit<Haiku, "id">[] = [];
 
-  haikus.forEach((haiku) => {
+  haikuList.forEach((haiku) => {
     if (haiku) {
-      const correspondingNews = newsWithTopics.find(
-        (news) => haiku.topic === news.topic || haiku.topic === news.webTitle,
+      const correspondingNews = latestNews.find(
+        (news) => haiku.topic === news.webTitle,
       );
       if (correspondingNews) {
         EnrichedHaikusList.push({
           ...haiku,
           date: dayjs(date).format("YYYYMMDD"),
-          classification: correspondingNews.classification,
+          classification: 0,
           articleTitle: correspondingNews.webTitle,
           articleUrl: correspondingNews.webUrl,
         });
@@ -98,6 +105,9 @@ async function generateAllHaikus(date: Date) {
   return EnrichedHaikusList;
 }
 
+// TODO: Merge the two functions by adding a parameter -> too much code duplication right now + difficult to understand
+// what is happening
+
 /**
  * Fetches today's haikus from the database if they were already generated
  * If not, will generate today's haikus and store them in the database
@@ -105,7 +115,11 @@ async function generateAllHaikus(date: Date) {
  * @param shouldGenerate if true, will generate the haikus if they were not already generated
  * @returns {Promise<Haiku[]>} The list of haikus generated
  */
-export async function getOrCreateHaikus(date: Date, shouldGenerate: boolean) {
+export async function getOrCreateHaikus(
+  date: Date,
+  shouldGenerate: boolean,
+  generateCount: number,
+) {
   await loginToFirebase();
 
   const todayHaikus = await fetchHaikusFromFirebase(date);
@@ -125,7 +139,7 @@ export async function getOrCreateHaikus(date: Date, shouldGenerate: boolean) {
   console.log(
     `getOrCreateHaikus: Today's haikus were not generated yet, generating...`,
   );
-  const enrichedHaikusList = await generateAllHaikus(date);
+  const enrichedHaikusList = await generateHaikuList(date, generateCount);
   // Now we have to store the haikus in the database, and return them
   const haikuWithIdList = await storeHaikusInFirebase(enrichedHaikusList);
 
@@ -138,21 +152,24 @@ export async function getOrCreateHaikus(date: Date, shouldGenerate: boolean) {
  * out of firebase in the case the API route is called too much.
  * @param date the date for which we want to generate the haikus
  */
-export async function generateHaikusIfNeeded(date: Date) {
+export async function generateHaikusIfNeeded(
+  date: Date,
+  generateCount: number,
+) {
   await loginToFirebase();
 
   const todayHaikuCount = await fetchHaikuCountFromFirebase(date);
   if (todayHaikuCount > 0) {
     console.log(
-      `GenerateHaikusIfNeeded - Today's haikus were already generated`,
+      `GenerateHaikusIfNeeded - Today's (${date.toLocaleString()}) haikus were already generated`,
     );
     return;
   }
   // If we didn't generate the haikus yet, we will generate them
   console.log(
-    `GenerateHaikusIfNeeded - Today's haikus were not generated yet, generating...`,
+    `GenerateHaikusIfNeeded - Today's haikus (${date.toLocaleString()}) were not generated yet, generating...`,
   );
-  const enrichedHaikusList = await generateAllHaikus(date);
+  const enrichedHaikusList = await generateHaikuList(date, generateCount);
   // Now we have to store the haikus in the database, and return them
   const haikuWithIdList = await storeHaikusInFirebase(enrichedHaikusList);
   return;
