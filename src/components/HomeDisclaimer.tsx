@@ -20,7 +20,7 @@ export function HomeDisclaimer() {
   // Non-default case: Display the whole disclaimer
 
   return (
-    <div className="flex flex-col items-center justify-between rounded-lg bg-orange-200 p-4">
+    <div className="flex flex-col items-center justify-between rounded-lg bg-orange-200 p-4 dark:bg-blue-900">
       <p>
         This website is a hobby project, which generates haikus(*) based on some
         news of the day from <a href="www.theguardian.com">The Guardian</a>. The
