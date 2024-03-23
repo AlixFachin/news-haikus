@@ -43,31 +43,32 @@ export const generateHaiku = async (topic: string) => {
 
   const parts = [
     {
-      text: `You are an expert in Japanese culture and knows how to write perfect Japanese, including the ability to write Senryu which are poems in Japanese.
+      text: `You are an expert in Japanese culture and knows how to write perfect Japanese, including the ability to write senryu which are poems in Japanese.
 
-**Senryu** (川柳) is a type of short Japanese poem that uses imagery, wordplay, and wit to capture a moment or observation about human nature. It is similar to the haiku,
+**senryu** (川柳) is a type of short Japanese poem that uses imagery, wordplay, and wit to capture a moment or observation about human nature. It is similar to the haiku,
 but with a more satirical and humorous tone. While haiku focuses on nature and the beauty of the present moment, senryu often explores the follies and foibles of humanity.
 
 **Characteristics:**
 
-* **Syllable Count:** Senryu traditionally consists of three lines, with five syllables in the first line, seven syllables in the second line, and five syllables in the third line. 
+* **Syllable Count:** senryu traditionally consists of three lines, with five syllables in the first line, seven syllables in the second line, and five syllables in the third line. 
 This 5-7-5 syllable count is similar to the haiku.
-* **Humorous or Satirical Tone:** Senryu often uses humor, irony, and satire to convey its message. It may poke fun at human behavior, social conventions, or everyday situations.
-* **Everyday Language:** Senryu uses simple, everyday language and imagery, making it accessible to a wide audience. It often draws upon common experiences and observations of daily life.
-* **Surprise or Twist:** Senryu often contains a surprise or twist at the end, which adds to its humorous or thought-provoking effect. This twist may come in the form of a sudden shift in perspective,
+* **Humorous or Satirical Tone:** senryu often uses humor, irony, and satire to convey its message. It may poke fun at human behavior, social conventions, or everyday situations.
+* **Everyday Language:** senryu uses simple, everyday language and imagery, making it accessible to a wide audience. It often draws upon common experiences and observations of daily life.
+* **Surprise or Twist:** senryu often contains a surprise or twist at the end, which adds to its humorous or thought-provoking effect. This twist may come in the form of a sudden shift in perspective,
 a clever turn of phrase, or an unexpected punchline.
 
-**Writing Senryu:**
-* **Focus on Human Nature:** Senryu typically focuses on human nature, capturing the follies and foibles of everyday life.
+**Writing senryu:**
+* **Focus on Human Nature:** senryu typically focuses on human nature, capturing the follies and foibles of everyday life.
 It may explore themes such as love, loss, aging, relationships, and social conventions.
-* **Use Imagery and Wordplay:** Senryu often relies on vivid imagery and wordplay to create a memorable and impactful poem.
+* **Use Imagery and Wordplay:** senryu often relies on vivid imagery and wordplay to create a memorable and impactful poem.
 It may use metaphors, similes, puns, and other figures of speech to convey its message.
 * **Surprise or Twist:** A well-written senryu often contains a surprise or twist at the end, which adds to its humorous or thought-provoking effect. This twist may come in the form of a sudden shift in perspective,
 a clever turn of phrase, or an unexpected punchline.\n\n**What you need to do**
 
 Compose a senryu on the topic of ${topic} that incorporates humor, irony, or satire. Use vivid imagery and wordplay to create a memorable and impactful poem.
-Aim for a 5-7-5 syllable count and include a surprise or twist at the end.
-Please output the Senry in the shape of a JSON object with the schema containing one property called "senryu" containing the senryu in Japanese, 
+Aim for a 5-7-5 syllable count and include a surprise or twist at the end. It is better to respect the 5-7-5 syllabe count and digress from the topic if needed,
+rather than to be close to the topic but missing the syllabe count.
+Please output the senryu in the shape of a JSON object with the schema containing one property called "senryu" containing the senryu in Japanese,
 "reading" with the reading in English, and "en" with an English translation.
 
 ** Examples **
