@@ -3,9 +3,22 @@ import { DayHaikuContainer } from "@/components/HaikuContainer";
 import DateSwitcher from "@/components/DateSwitcher";
 import Spinner from "@/components/Spinner";
 import dayjs from "dayjs";
+import { Metadata } from "next";
 
 // TODO -> Put in a higher value to avoid re-rendering the same page all over again
 export const revalidate = 0;
+
+export function generateMetadata({
+  params,
+}: {
+  params: { archiveDate: string };
+}): Metadata {
+  const archiveDate = dayjs(params.archiveDate);
+  return {
+    // The other fields are inherited by the root-level layout
+    title: `AI-Generated Haikus for ${archiveDate.format("DD-MMM-YYYY")}`,
+  };
+}
 
 export default function ArchivePage({
   params,
