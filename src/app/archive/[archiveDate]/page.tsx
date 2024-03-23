@@ -3,9 +3,24 @@ import { DayHaikuContainer } from "@/components/HaikuContainer";
 import DateSwitcher from "@/components/DateSwitcher";
 import Spinner from "@/components/Spinner";
 import dayjs from "dayjs";
+import { Metadata } from "next";
 
 // TODO -> Put in a higher value to avoid re-rendering the same page all over again
 export const revalidate = 0;
+
+export function generateMetadata({
+  params,
+}: {
+  params: { archiveDate: string };
+}): Metadata {
+  const archiveDate = dayjs(params.archiveDate);
+  return {
+    title: `AI-Generated Haikus for ${archiveDate.format("DD-MMM-YYYY")}`,
+    description: "Details of a AI-generated haiku based on the news of the day",
+    keywords: ["haiku", "AI", "news", "Gemini", "senryu", "Japanese"],
+    authors: [{ name: "Alix Fachin", url: "https://codeandpastries.dev" }],
+  };
+}
 
 export default function ArchivePage({
   params,

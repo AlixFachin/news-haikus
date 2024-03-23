@@ -3,10 +3,19 @@ import { Suspense } from "react";
 import Spinner from "@/components/Spinner";
 import DateSwitcher from "@/components/DateSwitcher";
 import { HomeDisclaimer } from "@/components/HomeDisclaimer";
+import { Metadata } from "next";
 
 // Setting the page revalidation cache options
 // See https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config
 export const revalidate = 0;
+
+// Meta-Data
+export const metadata: Metadata = {
+  title: "AI-Generated Haikus of the day",
+  description: "Generate a few haikus every day, based on the news of the day",
+  keywords: ["haiku", "AI", "news", "Gemini", "senryu", "Japanese"],
+  authors: [{ name: "Alix Fachin", url: "https://codeandpastries.dev" }],
+};
 
 export default function Home() {
   const todayDate = new Date();

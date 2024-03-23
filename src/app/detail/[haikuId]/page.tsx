@@ -6,6 +6,7 @@ import {
 import { notFound } from "next/navigation";
 import dayjs from "dayjs";
 import Link from "next/link";
+import { Metadata } from "next";
 
 /**
  * generateStaticParams is useful for generating static paths for all HaikuIDs.
@@ -14,6 +15,19 @@ import Link from "next/link";
 export async function generateStaticParams() {
   const haikus = await getAllHaikuIdsFromFirebase();
   return haikus.map((haikuId) => ({ haikuId: haikuId }));
+}
+
+export function generateMetadata({
+  params,
+}: {
+  params: { haikuId: string };
+}): Metadata {
+  return {
+    title: "AI-Generated Haikus (Detail)",
+    description: "Details of a AI-generated haiku based on the news of the day",
+    keywords: ["haiku", "AI", "news", "Gemini", "senryu", "Japanese"],
+    authors: [{ name: "Alix Fachin", url: "https://codeandpastries.dev" }],
+  };
 }
 
 export default async function HaikuDetailPage({
