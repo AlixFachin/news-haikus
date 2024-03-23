@@ -22,6 +22,7 @@ export function generateMetadata({
 }: {
   params: { haikuId: string };
 }): Metadata {
+  // TODO: Generate the OpenGraph image corresponding to the haiku detail page
   return {
     title: "AI-Generated Haikus (Detail)",
     description: "Details of a AI-generated haiku based on the news of the day",

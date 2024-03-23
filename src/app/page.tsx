@@ -12,9 +12,6 @@ export const revalidate = 0;
 // Meta-Data
 export const metadata: Metadata = {
   title: "AI-Generated Haikus of the day",
-  description: "Generate a few haikus every day, based on the news of the day",
-  keywords: ["haiku", "AI", "news", "Gemini", "senryu", "Japanese"],
-  authors: [{ name: "Alix Fachin", url: "https://codeandpastries.dev" }],
 };
 
 export default function Home() {
