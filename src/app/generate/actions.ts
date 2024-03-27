@@ -1,9 +1,26 @@
 "use server";
 
-import { getNews } from "@/utils/news";
-import { extractTopicFromTitles } from "@/utils/NewsClassifier";
+import { generateHaiku } from "@/utils/haikuGenerator";
 
-export async function fetchNews() {
-  const topicsList = await getNews();
-  return topicsList;
+import z from "zod";
+
+const GenerateParamSchema = z.object({
+  temperature: z.number().optional(),
+  topK: z.number().optional(),
+  topP: z.number().optional(),
+  prompt: z.string().optional(),
+  topic: z.string(),
+});
+
+export type GenHaikuParameters = z.infer<typeof GenerateParamSchema>;
+
+export async function sa_generateHaiku(parameters: GenHaikuParameters) {
+  // TODO: Parameter validation
+  const haiku = await generateHaiku(parameters.topic);
+
+  if (!haiku) {
+    return { error: "No haiku generated!" };
+  }
+
+  return haiku;
 }

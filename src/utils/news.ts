@@ -1,5 +1,6 @@
 import zod from "zod";
 import dayjs from "dayjs";
+import { getNewsFromFirebase, storeNewsInFirebase } from "./firebase";
 
 const newsSchema = zod.object({
   total: zod.number(),
@@ -19,8 +20,9 @@ const newsSchema = zod.object({
 });
 
 export type newsSchemaType = zod.infer<typeof newsSchema>;
+export type NewsItem = newsSchemaType["results"][number];
 
-export const getNews = async () => {
+export const getNewsFromAPI = async () => {
   const GUARDIAN_API_KEY = process.env.GUARDIAN_API_KEY;
   if (!GUARDIAN_API_KEY) {
     throw new Error("GUARDIAN_API_KEY is not set");
@@ -29,7 +31,7 @@ export const getNews = async () => {
   const sections: { id: string; q?: string }[] = [
     { id: "world", q: "japan, China, Thailand, Korea" },
     { id: "news", q: "japan" },
-    { id: "lifeandstyle", q: "japan" },
+    { id: "lifeandstyle" },
     { id: "science" },
     { id: "arts" },
   ];
@@ -39,14 +41,19 @@ export const getNews = async () => {
     webTitle: string;
     sectionId?: string;
     webUrl: string;
+    date: string;
   }[] = [];
 
   const query_url = new URL("https://content.guardianapis.com/search");
 
   // DATE FROM QUERY PARAMETER
   query_url.searchParams.append("api-key", GUARDIAN_API_KEY);
-  const fromDate = dayjs().subtract(3, "day").format("YYYY-MM-DD");
-  query_url.searchParams.append("from-date", fromDate);
+  const currentDate = dayjs();
+
+  query_url.searchParams.append(
+    "from-date",
+    currentDate.subtract(1, "day").format("YYYY-MM-DD"),
+  );
   query_url.searchParams.append("order-by", "newest");
 
   for (const section of sections) {
@@ -68,8 +75,30 @@ export const getNews = async () => {
     const responseJSON = await response.json();
     const news = newsSchema.parse(responseJSON.response);
 
-    news.results.forEach((result) => topics.push(result));
+    news.results.forEach((result) =>
+      topics.push({ ...result, date: currentDate.format("YYYYMMDD") }),
+    );
   }
 
+  await storeNewsInFirebase(topics);
+
   return topics;
+};
+
+/**
+ * get the news for today. Checks if the news are already in the database, in such case
+ * it returns the DB content. If the DB is empty, it will download the news from the API
+ * @returns list of article information
+ */
+export const getNews = async () => {
+  const todayDate = dayjs();
+  const newsInDB = await getNewsFromFirebase(todayDate.toDate());
+  if (newsInDB.length > 0) {
+    console.log(
+      `getNews: News already inside the DB, no need to download from API!`,
+    );
+    return newsInDB;
+  }
+  // (no need for await as we are already inside a promise)
+  return getNewsFromAPI();
 };
