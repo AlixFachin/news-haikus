@@ -10,6 +10,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@clerk/nextjs": "^4.29.9",
     "@google/generative-ai": "^0.2.1",
     "@mdx-js/loader": "^3.0.1",
     "@mdx-js/react": "^3.0.1",

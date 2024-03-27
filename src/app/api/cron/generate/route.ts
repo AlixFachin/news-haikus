@@ -13,7 +13,9 @@ export async function GET(request: Request) {
   // We will call the function which creates the haikus
   try {
     const date = dayjs();
-    console.log(`Cron job started at ${date.format("YYYY-MM-DD HH:mm:ss")}`);
+    console.log(
+      `Cron job started at ${date.format("YYYY-MM-DD HH:mm:ss")} - Haikus Generation`,
+    );
     await generateHaikusIfNeeded(date.toDate(), HAIKUS_GENERATED_IN_ROUTE);
     return NextResponse.json(
       { status: "Success", date: date.format("YYYY-MM-DD HH:mm:ss") },

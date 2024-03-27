@@ -11,10 +11,12 @@ import {
   addDoc,
   doc,
   getDoc,
+  writeBatch,
 } from "firebase/firestore";
 import type { Haiku } from "@/utils/types";
 import { HaikuDBSchema } from "@/utils/types";
 import dayjs from "dayjs";
+import { createHash } from "crypto";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -179,4 +181,55 @@ export async function storeHaikusInFirebase(
     // Note that we use a type predicate to tell Typescript that all 'undefined' values will be filtered out
     haikus.filter((haiku): haiku is Haiku => !!haiku),
   );
+}
+
+import { newsSchemaType } from "./news";
+
+type NewsArticle = newsSchemaType["results"][number] & { date: string };
+
+/**
+ * store a list of News Articles in the database
+ * @param newsList list of article data to be stored
+ */
+export async function storeNewsInFirebase(newsList: NewsArticle[]) {
+  const auth = getAuth(app);
+  if (!auth.currentUser) {
+    await loginToFirebase();
+  }
+
+  const db = getFirestore(app);
+  const batch = writeBatch(db);
+  newsList.forEach((news) => {
+    const hash = createHash("sha256");
+    // Using the SHA256 hash of the news id as the document id
+    hash.update(news.id);
+    const docId = hash.digest("hex");
+    const docRef = doc(db, "news", docId);
+    batch.set(docRef, news);
+  });
+  await batch.commit();
+}
+
+/**
+ * Fetches the news saved in the database for a given date
+ * @param date the date at which we want to retrieve the news
+ */
+export async function getNewsFromFirebase(date: Date) {
+  const auth = getAuth(app);
+  if (!auth.currentUser) {
+    await loginToFirebase();
+  }
+
+  const db = getFirestore(app);
+  const q = query(
+    collection(db, "news"),
+    where("date", "==", dayjs(date).format("YYYYMMDD")),
+  );
+
+  const result: NewsArticle[] = [];
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach((doc) => {
+    result.push(doc.data() as NewsArticle);
+  });
+  return result;
 }

@@ -57,8 +57,6 @@ function getRandomArray(length: number) {
  * @returns {Promise<Haiku[]>} The list of haikus generated
  */
 async function generateHaikuList(date: Date, count: number) {
-  //TODO: Extract the news download into its separate function + separate DB so that
-  // the regularly times cron can be split into two functions.
   const latestNews = await getNews();
   console.log(
     `generateAllHaikus - Output of News Download:\n ${JSON.stringify(latestNews)}`,
@@ -132,7 +130,7 @@ export async function getOrCreateHaikus(
   }
   if (!shouldGenerate) {
     console.log(
-      `getOrCreateHaikus: Today's haikus were not generated yet, and should not be generated`,
+      `getOrCreateHaikus: Today's haikus were not generated yet, and will not be generated`,
     );
     return [];
   }
