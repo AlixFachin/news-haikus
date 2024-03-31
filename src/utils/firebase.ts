@@ -183,6 +183,33 @@ export async function storeHaikusInFirebase(
   );
 }
 
+/**
+ * Stores a given haiku in the database
+ * @param haiku the haiku to store in the database
+ * @returns the haiku with its id
+ */
+export async function storeHaikuInFirebase(haiku: Omit<Haiku, "id">) {
+  const auth = getAuth(app);
+  if (!auth.currentUser) {
+    await loginToFirebase();
+  }
+
+  try {
+  const db = getFirestore(app);
+  const haikusRef = collection(db, "haikus");
+  const docRef = await addDoc(haikusRef, haiku);
+  const doc = await getDoc(docRef);
+  if (!doc.exists()) {
+    console.error(`Error storing haiku: ${JSON.stringify(haiku)}`);
+    return undefined;
+  }
+  return { ...haiku, id: doc.id };
+} catch (e) {
+    console.error(`Error storing haiku: ${JSON.stringify(haiku)}\nError: ${e}`);
+    return undefined;
+}
+}
+
 import { newsSchemaType } from "./news";
 
 type NewsArticle = newsSchemaType["results"][number] & { date: string };

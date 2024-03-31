@@ -1,6 +1,9 @@
 "use server";
 
 import { generateHaiku } from "@/utils/haikuGenerator";
+import { storeHaikuInFirebase } from "@/utils/firebase";
+import type { Haiku } from "@/utils/types";
+import { revalidatePath } from "next/cache";
 
 import z from "zod";
 
@@ -23,4 +26,13 @@ export async function sa_generateHaiku(parameters: GenHaikuParameters) {
   }
 
   return haiku;
+}
+
+export async function sa_saveHaikuInDB(haiku: Omit<Haiku, "id">) {
+  const savedHaiku = await storeHaikuInFirebase(haiku);
+  if (!savedHaiku) {
+    return { error: "Error saving haiku" };
+  }
+  revalidatePath("/", "page");
+  return savedHaiku;
 }
