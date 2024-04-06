@@ -14,7 +14,7 @@ export async function GET(request: Request) {
     console.log(
       `Cron job started at ${date.format("YYYY-MM-DD HH:mm:ss")} - News Download`,
     );
-    const newsList = await getNews(true);
+    const newsList = await getNews();
     return NextResponse.json(
       {
         status: "Success",

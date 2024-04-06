@@ -21,6 +21,11 @@ export const GenParamForm = ({ handleGenHaikuClick }: GenParamFormProps) => {
     formState: { errors },
   } = useForm<GenHaikuParameters>({
     resolver: zodResolver(GenerateParamSchema),
+    defaultValues: {
+      temperature: 0.9,
+      topK: 3,
+      topP: 0.8,
+    },
   });
   const onSubmit: SubmitHandler<GenHaikuParameters> = (data) => {
     console.log(`On submit handler\n${data}`);
