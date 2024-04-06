@@ -12,6 +12,7 @@
   "dependencies": {
     "@clerk/nextjs": "^4.29.9",
     "@google/generative-ai": "^0.2.1",
+    "@hookform/resolvers": "^3.3.4",
     "@mdx-js/loader": "^3.0.1",
     "@mdx-js/react": "^3.0.1",
     "@next/mdx": "^14.1.0",
@@ -21,6 +22,7 @@
     "next": "14.1.0",
     "react": "^18",
     "react-dom": "^18",
+    "react-hook-form": "^7.51.2",
     "zod": "^3.22.4"
   },
   "devDependencies": {

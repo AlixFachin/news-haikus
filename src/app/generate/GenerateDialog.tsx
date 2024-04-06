@@ -7,6 +7,8 @@ import SmallHaikuCard from "./SmallHaikuCard";
 import dayjs from "dayjs";
 import Spinner from "@/components/Spinner";
 import type { Haiku } from "@/utils/types";
+import { GenParamForm } from "./ParamForm";
+import type { GenHaikuParameters } from "@/utils/types";
 
 export default function GenerateDialog({
   newsItem,
@@ -22,10 +24,10 @@ export default function GenerateDialog({
   const [genPending, startGenTransition] = useTransition();
   const [savePending, startSaveTransition] = useTransition();
 
-  const handleGenHaikuClick = async (topic: string) => {
+  const handleGenHaikuClick = async (options: GenHaikuParameters) => {
     // We will use a Transition to show a spinner while the haiku is being generated
     startGenTransition(async () => {
-      const haiku = await sa_generateHaiku({ topic });
+      const haiku = await sa_generateHaiku(options);
       if (!haiku || "error" in haiku) {
         setHaikuError(haiku?.error);
         return;
@@ -73,20 +75,16 @@ export default function GenerateDialog({
           <span className="font-bold">Article Title</span>: {newsItem.webTitle}
         </h2>
         <div className="mb-2 grid grid-cols-1 md:grid-cols-2">
-          <div className="mr-4 grid grid-cols-1 gap-2 p-2">
-            <label>Temperature:</label>
-            <input type="number" />
-            <label>topK:</label>
-            <input type="number" />
-            <label>topP:</label>
-            <input type="number" />
-            <button
-              className="my-4 rounded-lg bg-orange-400 p-2 shadow-sm dark:bg-blue-600"
-              onClick={() => handleGenHaikuClick(newsItem.webTitle)}
-            >
-              Generate Haiku
-            </button>
-          </div>
+          <GenParamForm
+            handleGenHaikuClick={(options) =>
+              handleGenHaikuClick({
+                topic: newsItem.webTitle,
+                topK: options.topK,
+                topP: options.topP,
+                temperature: options.temperature,
+              })
+            }
+          />
           <div className="flex h-full w-full flex-col items-center justify-center">
             {genPending && <Spinner />}
             {haikuError && <p className="text-orange-700">{haikuError}</p>}

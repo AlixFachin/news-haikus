@@ -71,7 +71,7 @@ async function generateHaikuList(date: Date, count: number) {
           return currentHaikuList;
         }
         const news = latestNews[indexList[index]];
-        return generateHaiku(news.webTitle).then((haiku) => {
+        return generateHaiku({ topic: news.webTitle }).then((haiku) => {
           if (haiku) {
             return [...currentHaikuList, haiku];
           }
