@@ -4,21 +4,29 @@ import {
   HarmCategory,
 } from "@google/generative-ai";
 
+import { GenHaikuParameters } from "./types";
+
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 if (!GOOGLE_API_KEY) {
   throw new Error("GOOGLE_API_KEY is not set");
 }
 
 import { BasicHaikuSchema } from "./types";
+import { z } from "zod";
 
-export const generateHaiku = async (topic: string) => {
+export const generateHaiku = async (options: GenHaikuParameters) => {
   const generativeAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
+
+  const modelTemperature = options.temperature || 0.9;
+  const modelTopK = options.topK || 5;
+  const modelTopP = options.topP || 0.8;
+
   const model = await generativeAI.getGenerativeModel({
     model: "gemini-pro",
     generationConfig: {
-      temperature: 0.9,
-      topK: 5,
-      topP: 0.8,
+      temperature: modelTemperature,
+      topK: modelTopK,
+      topP: modelTopP,
     },
   });
 
@@ -65,7 +73,7 @@ It may use metaphors, similes, puns, and other figures of speech to convey its m
 * **Surprise or Twist:** A well-written senryu often contains a surprise or twist at the end, which adds to its humorous or thought-provoking effect. This twist may come in the form of a sudden shift in perspective,
 a clever turn of phrase, or an unexpected punchline.\n\n**What you need to do**
 
-Compose a senryu on the topic of ${topic} that incorporates humor, irony, or satire. Use vivid imagery and wordplay to create a memorable and impactful poem.
+Compose a senryu on the topic of ${options.topic} that incorporates humor, irony, or satire. Use vivid imagery and wordplay to create a memorable and impactful poem.
 Aim for a 5-7-5 syllable count and include a surprise or twist at the end. It is better to respect the 5-7-5 syllabe count and digress from the topic if needed,
 rather than to be close to the topic but missing the syllabe count.
 Please output the senryu in the shape of a JSON object with the schema containing one property called "senryu" containing the senryu in Japanese,
@@ -87,7 +95,7 @@ drink etiquette
     "en": "Politicians as well \\n Like me \\n Are bad at lying"
 }
 
-**Task Input**: ${topic}
+**Task Input**: ${options.topic}
 **Task Output**:
 `,
     },
@@ -116,7 +124,7 @@ drink etiquette
     // we add the topic in the return object so that we can connect the haiku with the meta-data
     if (zodParseResult.success) {
       const haiku = zodParseResult.data;
-      return { ...haiku, topic };
+      return { ...haiku, topic: options.topic };
     } else {
       console.error(
         `Haiku Generator - Error parsing haiku: ${zodParseResult.error}`,

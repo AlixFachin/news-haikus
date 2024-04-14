@@ -57,8 +57,6 @@ function getRandomArray(length: number) {
  * @returns {Promise<Haiku[]>} The list of haikus generated
  */
 async function generateHaikuList(date: Date, count: number) {
-  //TODO: Extract the news download into its separate function + separate DB so that
-  // the regularly times cron can be split into two functions.
   const latestNews = await getNews();
   console.log(
     `generateAllHaikus - Output of News Download:\n ${JSON.stringify(latestNews)}`,
@@ -73,7 +71,7 @@ async function generateHaikuList(date: Date, count: number) {
           return currentHaikuList;
         }
         const news = latestNews[indexList[index]];
-        return generateHaiku(news.webTitle).then((haiku) => {
+        return generateHaiku({ topic: news.webTitle }).then((haiku) => {
           if (haiku) {
             return [...currentHaikuList, haiku];
           }
@@ -122,7 +120,7 @@ export async function getOrCreateHaikus(
 ) {
   await loginToFirebase();
 
-  const todayHaikus = await fetchHaikusFromFirebase(date);
+  const todayHaikus = await fetchHaikusFromFirebase(date, "");
   if (todayHaikus.length > 0) {
     console.log(`getOrCreateHaikus: Today's haikus were already generated`);
     console.log(
@@ -132,7 +130,7 @@ export async function getOrCreateHaikus(
   }
   if (!shouldGenerate) {
     console.log(
-      `getOrCreateHaikus: Today's haikus were not generated yet, and should not be generated`,
+      `getOrCreateHaikus: Today's haikus were not generated yet, and will not be generated`,
     );
     return [];
   }
@@ -170,7 +168,7 @@ export async function generateHaikusIfNeeded(
     `GenerateHaikusIfNeeded - Today's haikus (${date.toLocaleString()}) were not generated yet, generating...`,
   );
   const enrichedHaikusList = await generateHaikuList(date, generateCount);
-  // Now we have to store the haikus in the database, and return them
+  // Now we have to store the haikus in the database
   const haikuWithIdList = await storeHaikusInFirebase(enrichedHaikusList);
   return;
 }

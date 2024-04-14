@@ -11,6 +11,9 @@ export const Footer = () => {
           <p>
             <Link href="/archive">Haiku Archive</Link>
           </p>
+          <p>
+            <Link href="/generate">Generate Haikus</Link>
+          </p>
         </div>
         <div className="flex flex-col items-center justify-evenly">
           <p>
