@@ -43,18 +43,21 @@ export const GenParamForm = ({ handleGenHaikuClick }: GenParamFormProps) => {
         <input
           type="number"
           step="0.05"
+          className="text-gray-700"
           {...register("temperature", { valueAsNumber: true })}
         />
         <label>topK:</label>
         <input
+          className="text-gray-700"
           type="number"
           step="1"
-          max="5"
+          max="6"
           min="1"
           {...register("topK", { valueAsNumber: true })}
         />
         <label>topP:</label>
         <input
+          className="text-gray-700"
           type="number"
           step="0.01"
           max="1"

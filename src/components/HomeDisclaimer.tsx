@@ -1,27 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { SummaryComponent } from "./SummaryComponent";
 
 export function HomeDisclaimer() {
-  const [showDisclaimer, setShowDisclaimer] = useState(true);
-
-  // Default case: Just display the button
-  if (!showDisclaimer) {
-    return (
-      <button
-        className="rounded-lg bg-orange-500 p-2 px-4 text-xl dark:bg-blue-800"
-        onClick={() => setShowDisclaimer(true)}
-      >
-        Show Disclaimer
-      </button>
-    );
-  }
-  // Non-default case: Display the whole disclaimer
-
   return (
-    <div className="flex flex-col items-center justify-between rounded-lg bg-orange-200 p-4 dark:bg-blue-900">
-      <p>
+    <SummaryComponent title="Disclaimer">
+      <p className="md:p-4">
         This website is a hobby project, which generates haikus(*) based on some
         news of the day from <a href="www.theguardian.com">The Guardian</a>. The
         model is not perfect, and the haikus might not make sense. Please
@@ -39,12 +24,6 @@ export function HomeDisclaimer() {
         <a href="https://en.wikipedia.org/wiki/Senryū">senryu</a>, but I decided
         to call them haikus for simplicity.
       </p>
-      <button
-        className="rounded-lg bg-orange-500 p-2 px-4 text-xl dark:bg-blue-800"
-        onClick={() => setShowDisclaimer(false)}
-      >
-        Hide Disclaimer
-      </button>
-    </div>
+    </SummaryComponent>
   );
 }

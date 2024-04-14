@@ -60,7 +60,7 @@ export async function loginToFirebase() {
  * @param date the date for which to fetch the haikus
  * @returns
  */
-export async function fetchHaikusFromFirebase(date: Date) {
+export async function fetchHaikusFromFirebase(date: Date, userId: string) {
   const result: Haiku[] = [];
 
   const auth = getAuth(app);
@@ -72,6 +72,7 @@ export async function fetchHaikusFromFirebase(date: Date) {
   const q = query(
     collection(db, "haikus"),
     where("date", "==", dayjs(date).format("YYYYMMDD")),
+    where("userId", "==", userId),
   );
   const querySnapshot = await getDocs(q);
 
@@ -188,26 +189,29 @@ export async function storeHaikusInFirebase(
  * @param haiku the haiku to store in the database
  * @returns the haiku with its id
  */
-export async function storeHaikuInFirebase(haiku: Omit<Haiku, "id">) {
+export async function storeHaikuInFirebase(
+  haiku: Omit<Haiku, "id">,
+  userId: string,
+): Promise<Haiku | undefined> {
   const auth = getAuth(app);
   if (!auth.currentUser) {
     await loginToFirebase();
   }
 
   try {
-  const db = getFirestore(app);
-  const haikusRef = collection(db, "haikus");
-  const docRef = await addDoc(haikusRef, haiku);
-  const doc = await getDoc(docRef);
-  if (!doc.exists()) {
-    console.error(`Error storing haiku: ${JSON.stringify(haiku)}`);
-    return undefined;
-  }
-  return { ...haiku, id: doc.id };
-} catch (e) {
+    const db = getFirestore(app);
+    const haikusRef = collection(db, "haikus");
+    const docRef = await addDoc(haikusRef, { ...haiku, userId: userId });
+    const doc = await getDoc(docRef);
+    if (!doc.exists()) {
+      console.error(`Error storing haiku: ${JSON.stringify(haiku)}`);
+      return undefined;
+    }
+    return { ...haiku, id: doc.id };
+  } catch (e) {
     console.error(`Error storing haiku: ${JSON.stringify(haiku)}\nError: ${e}`);
     return undefined;
-}
+  }
 }
 
 import { newsSchemaType } from "./news";

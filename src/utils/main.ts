@@ -120,7 +120,7 @@ export async function getOrCreateHaikus(
 ) {
   await loginToFirebase();
 
-  const todayHaikus = await fetchHaikusFromFirebase(date);
+  const todayHaikus = await fetchHaikusFromFirebase(date, "");
   if (todayHaikus.length > 0) {
     console.log(`getOrCreateHaikus: Today's haikus were already generated`);
     console.log(
@@ -168,7 +168,7 @@ export async function generateHaikusIfNeeded(
     `GenerateHaikusIfNeeded - Today's haikus (${date.toLocaleString()}) were not generated yet, generating...`,
   );
   const enrichedHaikusList = await generateHaikuList(date, generateCount);
-  // Now we have to store the haikus in the database, and return them
+  // Now we have to store the haikus in the database
   const haikuWithIdList = await storeHaikusInFirebase(enrichedHaikusList);
   return;
 }

@@ -67,14 +67,14 @@ export default function GenerateDialog({
 
   return (
     <section className="fixed left-0 top-0 flex h-screen w-screen items-center justify-center bg-black bg-opacity-50 backdrop-blur-md">
-      <div className="flex h-[500px] w-[600px] flex-col items-start justify-evenly rounded-lg bg-orange-200 p-4 dark:bg-blue-800">
+      <div className="flex min-h-[500px] w-3/4  max-w-3xl flex-col items-start justify-evenly rounded-lg bg-orange-200 p-4 dark:bg-blue-800">
         <h1 className="mb-2 text-xl font-bold">
           Generate a Haiku from a news Item
         </h1>
         <h2>
           <span className="font-bold">Article Title</span>: {newsItem.webTitle}
         </h2>
-        <div className="mb-2 grid grid-cols-1 md:grid-cols-2">
+        <div className="mb-2 grid grid-cols-1 self-center sm:grid-cols-2">
           <GenParamForm
             handleGenHaikuClick={(options) =>
               handleGenHaikuClick({

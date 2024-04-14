@@ -9,6 +9,7 @@ export const HaikuDBSchema = zod.object({
   articleUrl: zod.string(),
   topic: zod.string(),
   classification: zod.number(),
+  userId: zod.string().optional(),
 });
 
 export type Haiku = zod.infer<typeof HaikuDBSchema> & { id: string };
