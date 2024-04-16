@@ -32,7 +32,7 @@ export async function sa_generateHaiku(parameters: GenHaikuParameters) {
   }
 }
 
-export async function sa_saveHaikuInDB(haiku: Omit<Haiku, "id">) {
+export async function sa_saveHaikuInDB(haiku: Omit<Haiku, "id" | "userId">) {
   const { userId } = auth();
 
   if (userId !== process.env.CLERK_ADMIN_ID) {

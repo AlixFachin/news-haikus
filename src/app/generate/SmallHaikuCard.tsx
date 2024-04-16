@@ -7,9 +7,9 @@ export default function SmallHaikuCard({
   clearHaiku,
   saveHaiku,
 }: {
-  haiku: Omit<Haiku, "id">;
+  haiku: Omit<Haiku, "id" | "userId">;
   clearHaiku: () => void;
-  saveHaiku: (haiku: Omit<Haiku, "id">) => void;
+  saveHaiku: (haiku: Omit<Haiku, "id" | "userId">) => void;
 }) {
   return (
     <div className="flex flex-col items-center justify-center">

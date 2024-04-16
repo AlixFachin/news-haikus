@@ -49,9 +49,9 @@ export default function GenerateDialog({
     setHaikuError("");
   };
 
-  const saveHaiku: (haiku: Omit<Haiku, "id">) => Promise<void> = async (
-    haiku,
-  ) => {
+  const saveHaiku: (
+    haiku: Omit<Haiku, "id" | "userId">,
+  ) => Promise<void> = async (haiku) => {
     startSaveTransition(async () => {
       const savedHaiku = await sa_saveHaikuInDB(haiku);
       if (!savedHaiku || "error" in savedHaiku) {

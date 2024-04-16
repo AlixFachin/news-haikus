@@ -54,7 +54,7 @@ function getRandomArray(length: number) {
  * 3. Generate haikus from the topics
  * @param date the date for which we want to generate the haikus
  * @param count the number of haikus to generate
- * @returns {Promise<Haiku[]>} The list of haikus generated
+ * @returns {Promise<Omit<Haiku, "id" | "userId">[]>} The list of haikus generated
  */
 async function generateHaikuList(date: Date, count: number) {
   const latestNews = await getNews();
@@ -81,7 +81,7 @@ async function generateHaikuList(date: Date, count: number) {
     Promise.resolve<RawHaiku[]>([]),
   );
 
-  const EnrichedHaikusList: Omit<Haiku, "id">[] = [];
+  const EnrichedHaikusList: Omit<Haiku, "id" | "userId">[] = [];
 
   haikuList.forEach((haiku) => {
     if (haiku) {
@@ -120,7 +120,7 @@ export async function getOrCreateHaikus(
 ) {
   await loginToFirebase();
 
-  const todayHaikus = await fetchHaikusFromFirebase(date, "");
+  const todayHaikus = await fetchHaikusFromFirebase(date, "system");
   if (todayHaikus.length > 0) {
     console.log(`getOrCreateHaikus: Today's haikus were already generated`);
     console.log(
@@ -139,7 +139,12 @@ export async function getOrCreateHaikus(
   );
   const enrichedHaikusList = await generateHaikuList(date, generateCount);
   // Now we have to store the haikus in the database, and return them
-  const haikuWithIdList = await storeHaikusInFirebase(enrichedHaikusList);
+  const haikuWithIdList = await storeHaikusInFirebase(
+    enrichedHaikusList.map((haikuWithoutUserID) => ({
+      ...haikuWithoutUserID,
+      userId: "system",
+    })),
+  );
 
   return haikuWithIdList.filter((haiku) => !!haiku);
 }
@@ -156,7 +161,7 @@ export async function generateHaikusIfNeeded(
 ) {
   await loginToFirebase();
 
-  const todayHaikuCount = await fetchHaikuCountFromFirebase(date);
+  const todayHaikuCount = await fetchHaikuCountFromFirebase(date, "system");
   if (todayHaikuCount > 0) {
     console.log(
       `GenerateHaikusIfNeeded - Today's (${date.toLocaleString()}) haikus were already generated`,
@@ -169,7 +174,12 @@ export async function generateHaikusIfNeeded(
   );
   const enrichedHaikusList = await generateHaikuList(date, generateCount);
   // Now we have to store the haikus in the database
-  const haikuWithIdList = await storeHaikusInFirebase(enrichedHaikusList);
+  const haikuWithIdList = await storeHaikusInFirebase(
+    enrichedHaikusList.map((haikuWithoutUserID) => ({
+      ...haikuWithoutUserID,
+      userId: "system",
+    })),
+  );
   return;
 }
 

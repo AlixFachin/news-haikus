@@ -87,19 +87,29 @@ export async function fetchHaikusFromFirebase(date: Date, userId: string) {
 /**
  * returns the number of haikus in a database for a given date
  * @param date the date for which to fetch the haikus
+ * @param userId the user id for which to fetch the haikus, or undefined if we want to get count of all haikus for all users
  * @returns the number of haikus
  */
-export async function fetchHaikuCountFromFirebase(date: Date) {
+export async function fetchHaikuCountFromFirebase(
+  date: Date,
+  userId: string | undefined,
+) {
   const auth = getAuth(app);
   if (!auth.currentUser) {
     await loginToFirebase();
   }
 
   const db = getFirestore(app);
-  const q = query(
-    collection(db, "haikus"),
-    where("date", "==", dayjs(date).format("YYYYMMDD")),
-  );
+  const q = userId
+    ? query(
+        collection(db, "haikus"),
+        where("date", "==", dayjs(date).format("YYYYMMDD")),
+        where("userId", "==", userId),
+      )
+    : query(
+        collection(db, "haikus"),
+        where("date", "==", dayjs(date).format("YYYYMMDD")),
+      );
 
   const haikuCount = await getCountFromServer(q);
   return haikuCount.data().count;
@@ -190,7 +200,7 @@ export async function storeHaikusInFirebase(
  * @returns the haiku with its id
  */
 export async function storeHaikuInFirebase(
-  haiku: Omit<Haiku, "id">,
+  haiku: Omit<Haiku, "id" | "userId">,
   userId: string,
 ): Promise<Haiku | undefined> {
   const auth = getAuth(app);
@@ -207,7 +217,7 @@ export async function storeHaikuInFirebase(
       console.error(`Error storing haiku: ${JSON.stringify(haiku)}`);
       return undefined;
     }
-    return { ...haiku, id: doc.id };
+    return { ...haiku, id: doc.id, userId: userId };
   } catch (e) {
     console.error(`Error storing haiku: ${JSON.stringify(haiku)}\nError: ${e}`);
     return undefined;

@@ -9,7 +9,7 @@ export const HaikuDBSchema = zod.object({
   articleUrl: zod.string(),
   topic: zod.string(),
   classification: zod.number(),
-  userId: zod.string().optional(),
+  userId: zod.string(),
 });
 
 export type Haiku = zod.infer<typeof HaikuDBSchema> & { id: string };
@@ -21,9 +21,10 @@ export const BasicHaikuSchema = zod.object({
   en: zod.string(),
   topic: zod.string().optional(),
 });
-
 export type BasicHaiku = zod.infer<typeof BasicHaikuSchema>;
 
+// GenerateParamSchema represents the necessary hyper-parameters to generate a Haiku
+// These will be used for form validation, to make sure the user entered the necessary parameters
 export const GenerateParamSchema = zod.object({
   temperature: zod.number().optional(),
   topK: zod
