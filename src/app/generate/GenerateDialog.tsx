@@ -74,7 +74,7 @@ export default function GenerateDialog({
         <h2>
           <span className="font-bold">Article Title</span>: {newsItem.webTitle}
         </h2>
-        <div className="mb-2 grid grid-cols-1 self-center sm:grid-cols-2">
+        <div className="mb-2 grid grid-cols-1 gap-2 self-center sm:grid-cols-2">
           <GenParamForm
             handleGenHaikuClick={(options) =>
               handleGenHaikuClick({
@@ -85,7 +85,7 @@ export default function GenerateDialog({
               })
             }
           />
-          <div className="flex h-full w-full flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center">
             {genPending && <Spinner />}
             {haikuError && <p className="text-orange-700">{haikuError}</p>}
             {!haikuError && haikuText != "" && (
