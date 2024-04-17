@@ -163,7 +163,8 @@ export async function getAllHaikuIdsFromFirebase() {
 }
 
 /**
- * Stores the haikus in the Firebase database
+ * Stores a list of haikus in the Firebase database
+ * (Expect to be called only when the system generates a bunch of haikus daily)
  * @param haikus the list of haikus to store
  * @returns the list of haikus with their ids
  */
@@ -206,6 +207,18 @@ export async function storeHaikuInFirebase(
   const auth = getAuth(app);
   if (!auth.currentUser) {
     await loginToFirebase();
+  }
+
+  // TODO: Do not catch exceptions - raise exceptions in above layer so that error message/reason can be conveyed
+
+  // Checking if the user didn't generate too many haikus today if the user is not admin
+  // TODO: Really need to log the actual GENERATION rather than the storage (what if bad user keeps generating but stores nothing?)
+  if (userId !== process.env.ADMIN_USER_ID) {
+    const nr_haikus = await fetchHaikuCountFromFirebase(new Date(), userId);
+    if (nr_haikus >= Number(process.env.MAX_HAIKUS_PER_DAY)) {
+      console.error(`User ${userId} has generated too many haikus today`);
+      return undefined;
+    }
   }
 
   try {
