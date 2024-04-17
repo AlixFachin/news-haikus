@@ -10,9 +10,13 @@ export const DateSwitcher = ({ currentDate }: { currentDate: Date }) => {
         &lt;
       </Link>
       <div className="ml-4 mr-4 text-sm">Change Haiku Date</div>
-      <Link href={`/archive/${djsDate.add(1, "day").format("YYYYMMDD")}`}>
-        &gt;
-      </Link>
+      {djsDate.isBefore(dayjs(), "day") ? (
+        <Link href={`/archive/${djsDate.add(1, "day").format("YYYYMMDD")}`}>
+          &gt;
+        </Link>
+      ) : (
+        <span>&gt;</span>
+      )}
     </div>
   );
 };

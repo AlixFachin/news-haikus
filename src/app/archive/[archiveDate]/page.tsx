@@ -4,6 +4,7 @@ import DateSwitcher from "@/components/DateSwitcher";
 import Spinner from "@/components/Spinner";
 import dayjs from "dayjs";
 import { Metadata } from "next";
+import { RedirectType, redirect } from "next/navigation";
 
 // TODO -> Put in a higher value to avoid re-rendering the same page all over again
 export const revalidate = 0;
@@ -26,6 +27,12 @@ export default function ArchivePage({
   params: { archiveDate: string };
 }) {
   const archiveDate = dayjs(params.archiveDate);
+
+  // If asking for today's date, we redirect to the home page
+  if (archiveDate.isSame(dayjs(), "day")) {
+    redirect("/", RedirectType.replace);
+    return;
+  }
 
   return (
     <main className="flex min-h-screen flex-col flex-wrap items-center justify-evenly sm:p-4 xl:p-24">
