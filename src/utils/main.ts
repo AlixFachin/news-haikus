@@ -22,7 +22,7 @@ import generateHaiku from "./haikuGenerator";
 import { getNews } from "./news";
 import { extractTopicFromTitles } from "./NewsClassifier";
 import type { Haiku } from "./types";
-import { get } from "http";
+import { getDateFormatJapanTime } from "./datetimeUtils";
 
 type NewsWithTopic = Awaited<ReturnType<typeof getNews>>[number] &
   Omit<Awaited<ReturnType<typeof extractTopicFromTitles>>[number], "title">;
@@ -91,7 +91,7 @@ async function generateHaikuList(date: Date, count: number) {
       if (correspondingNews) {
         EnrichedHaikusList.push({
           ...haiku,
-          date: dayjs(date).format("YYYYMMDD"),
+          date: getDateFormatJapanTime(date),
           classification: 0,
           articleTitle: correspondingNews.webTitle,
           articleUrl: correspondingNews.webUrl,

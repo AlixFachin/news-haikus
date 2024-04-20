@@ -15,8 +15,8 @@ import {
 } from "firebase/firestore";
 import type { Haiku } from "@/utils/types";
 import { HaikuDBSchema } from "@/utils/types";
-import dayjs from "dayjs";
 import { createHash } from "crypto";
+import { getDateFormatJapanTime } from "@/utils/datetimeUtils";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -62,6 +62,7 @@ export async function loginToFirebase() {
  */
 export async function fetchHaikusFromFirebase(date: Date, userId: string) {
   const result: Haiku[] = [];
+  const dateKey = getDateFormatJapanTime(date);
 
   const auth = getAuth(app);
   if (!auth.currentUser) {
@@ -71,7 +72,7 @@ export async function fetchHaikusFromFirebase(date: Date, userId: string) {
   const db = getFirestore(app);
   const q = query(
     collection(db, "haikus"),
-    where("date", "==", dayjs(date).format("YYYYMMDD")),
+    where("date", "==", dateKey),
     where("userId", "==", userId),
   );
   const querySnapshot = await getDocs(q);
@@ -98,18 +99,16 @@ export async function fetchHaikuCountFromFirebase(
   if (!auth.currentUser) {
     await loginToFirebase();
   }
+  const dateKey = getDateFormatJapanTime(date);
 
   const db = getFirestore(app);
   const q = userId
     ? query(
         collection(db, "haikus"),
-        where("date", "==", dayjs(date).format("YYYYMMDD")),
+        where("date", "==", dateKey),
         where("userId", "==", userId),
       )
-    : query(
-        collection(db, "haikus"),
-        where("date", "==", dayjs(date).format("YYYYMMDD")),
-      );
+    : query(collection(db, "haikus"), where("date", "==", dateKey));
 
   const haikuCount = await getCountFromServer(q);
   return haikuCount.data().count;
@@ -274,11 +273,9 @@ export async function getNewsFromFirebase(date: Date) {
     await loginToFirebase();
   }
 
+  const dateKey = getDateFormatJapanTime(date);
   const db = getFirestore(app);
-  const q = query(
-    collection(db, "news"),
-    where("date", "==", dayjs(date).format("YYYYMMDD")),
-  );
+  const q = query(collection(db, "news"), where("date", "==", dateKey));
 
   const result: NewsArticle[] = [];
   const querySnapshot = await getDocs(q);

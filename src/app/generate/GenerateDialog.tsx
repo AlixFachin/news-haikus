@@ -9,6 +9,7 @@ import Spinner from "@/components/Spinner";
 import type { Haiku } from "@/utils/types";
 import { GenParamForm } from "./ParamForm";
 import type { GenHaikuParameters } from "@/utils/types";
+import { getTodayDateFormatJapanTime } from "@/utils/datetimeUtils";
 
 export default function GenerateDialog({
   newsItem,
@@ -94,7 +95,7 @@ export default function GenerateDialog({
                   senryu: haikuText,
                   reading: haikuReading,
                   en: haikuEn,
-                  date: dayjs().format("YYYYMMDD"),
+                  date: getTodayDateFormatJapanTime(),
                   classification: 5,
                   topic: newsItem.webTitle,
                   articleTitle: newsItem.webTitle,

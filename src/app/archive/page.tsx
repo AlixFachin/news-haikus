@@ -1,6 +1,8 @@
 import ArchivePage from "./[archiveDate]/page";
-import dayjs from "dayjs";
+import { getTodayDateFormatJapanTime } from "@/utils/datetimeUtils";
 
 export default function RootArchivePage() {
-  return <ArchivePage params={{ archiveDate: dayjs().format("YYYYMMDD") }} />;
+  return (
+    <ArchivePage params={{ archiveDate: getTodayDateFormatJapanTime() }} />
+  );
 }

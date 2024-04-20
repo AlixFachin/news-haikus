@@ -1,6 +1,14 @@
 import zod from "zod";
 import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 import { getNewsFromFirebase, storeNewsInFirebase } from "./firebase";
+
+import { getDateFormatJapanTimeFromDayjs } from "./datetimeUtils";
 
 const newsSchema = zod.object({
   total: zod.number(),
@@ -52,7 +60,7 @@ export const getNewsFromAPI = async () => {
 
   query_url.searchParams.append(
     "from-date",
-    currentDate.subtract(1, "day").format("YYYY-MM-DD"),
+    currentDate.subtract(1, "day").tz("Asia/Tokyo").format("YYYY-MM-DD"),
   );
   query_url.searchParams.append("order-by", "newest");
 
@@ -76,7 +84,10 @@ export const getNewsFromAPI = async () => {
     const news = newsSchema.parse(responseJSON.response);
 
     news.results.forEach((result) =>
-      topics.push({ ...result, date: currentDate.format("YYYYMMDD") }),
+      topics.push({
+        ...result,
+        date: getDateFormatJapanTimeFromDayjs(currentDate),
+      }),
     );
   }
 
