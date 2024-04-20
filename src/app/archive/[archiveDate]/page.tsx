@@ -41,12 +41,7 @@ export default function ArchivePage({
       </h1>
       <section>
         <Suspense fallback={<Spinner />}>
-          {
-            <DayHaikuContainer
-              shouldGenerate={false}
-              haikuDate={archiveDate.toDate()}
-            />
-          }
+          {<DayHaikuContainer haikuDate={archiveDate.toDate()} />}
         </Suspense>
       </section>
       <DateSwitcher currentDate={archiveDate.toDate()} />

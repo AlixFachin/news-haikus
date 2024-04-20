@@ -103,78 +103,46 @@ async function generateHaikuList(date: Date, count: number) {
   return EnrichedHaikusList;
 }
 
-// TODO: Merge the two functions by adding a parameter -> too much code duplication right now + difficult to understand
-// what is happening
-
 /**
  * Fetches today's haikus from the database if they were already generated
  * If not, will generate today's haikus and store them in the database
  * @param date the date for which we want to generate the haikus
- * @param shouldGenerate if true, will generate the haikus if they were not already generated
  * @returns {Promise<Haiku[]>} The list of haikus generated
  */
-export async function getOrCreateHaikus(
-  date: Date,
-  shouldGenerate: boolean,
-  generateCount: number,
-) {
+export async function getHaikusForDay(date: Date) {
   await loginToFirebase();
 
   const todayHaikus = await fetchHaikusFromFirebase(date, "system");
-  if (todayHaikus.length > 0) {
-    console.log(`getOrCreateHaikus: Today's haikus were already generated`);
-    console.log(
-      `getOrCreateHaikus - Today's haikus:\n ${todayHaikus.map((haiku) => haiku.articleTitle).join("\n")}`,
-    );
-    return todayHaikus;
-  }
-  if (!shouldGenerate) {
-    console.log(
-      `getOrCreateHaikus: Today's haikus were not generated yet, and will not be generated`,
-    );
-    return [];
-  }
   console.log(
-    `getOrCreateHaikus: Today's haikus were not generated yet, generating...`,
+    `getOrCreateHaikus: Checking haiku DB State for ${date.toISOString()}`,
   );
-  const enrichedHaikusList = await generateHaikuList(date, generateCount);
-  // Now we have to store the haikus in the database, and return them
-  const haikuWithIdList = await storeHaikusInFirebase(
-    enrichedHaikusList.map((haikuWithoutUserID) => ({
-      ...haikuWithoutUserID,
-      userId: "system",
-    })),
-  );
-
-  return haikuWithIdList.filter((haiku) => !!haiku);
+  return todayHaikus;
 }
 
 /**
- * Check if haikus for a specific date were generated. If not, generates them.
- * This method doesn't return the actual haiku list, so it will prevent excessive data transfer
- * out of firebase in the case the API route is called too much.
- * @param date the date for which we want to generate the haikus
+ * Generate one Haiku for a specific date, if the system didn't generate it yet
+ * @param date the date for which we want to generate the haiku
  */
-export async function generateHaikusIfNeeded(
-  date: Date,
-  generateCount: number,
-) {
+export async function generateOneHaikuFromDate(date: Date) {
   await loginToFirebase();
+  const NB_SYSTEM_HAIKUS_PER_DAY = process.env.NB_SYSTEM_HAIKUS_PER_DAY
+    ? Number(process.env.NB_SYSTEM_HAIKUS_PER_DAY)
+    : 3;
 
   const todayHaikuCount = await fetchHaikuCountFromFirebase(date, "system");
-  if (todayHaikuCount > 0) {
+  if (todayHaikuCount >= NB_SYSTEM_HAIKUS_PER_DAY) {
     console.log(
-      `GenerateHaikusIfNeeded - Today's (${date.toLocaleString()}) haikus were already generated`,
+      `GenerateOneHaikuForDate ${date.toLocaleString()} - exiting as ${todayHaikuCount} haikus were already generated`,
     );
     return;
   }
-  // If we didn't generate the haikus yet, we will generate them
+
   console.log(
-    `GenerateHaikusIfNeeded - Today's haikus (${date.toLocaleString()}) were not generated yet, generating...`,
+    `GenerateOneHaikuForDate ${date.toLocaleString()} - generating one haiku...`,
   );
-  const enrichedHaikusList = await generateHaikuList(date, generateCount);
-  // Now we have to store the haikus in the database
-  const haikuWithIdList = await storeHaikusInFirebase(
+
+  const enrichedHaikusList = await generateHaikuList(date, 1);
+  await storeHaikusInFirebase(
     enrichedHaikusList.map((haikuWithoutUserID) => ({
       ...haikuWithoutUserID,
       userId: "system",
@@ -182,5 +150,3 @@ export async function generateHaikusIfNeeded(
   );
   return;
 }
-
-export default getOrCreateHaikus;

@@ -1,27 +1,12 @@
 import { HaikuBox } from "./HaikuBox";
-import getOrCreateHaikus from "@/utils/main";
-
-const COUNT_HAIKU_GENERATED_DURING_BUILD = 5;
+import { getHaikusForDay } from "@/utils/main";
 
 /**
  * This Component will display all the haikus for a given day passed in parameter
- * If there are no haikus for the day, it will either generate the haikus or display a message
- * according to the parameter
- * @param shouldGenerate - If true, it will generate the haikus if there are none
- * @returns
+ * If there are no haikus for the day it will display a message
  */
-export const DayHaikuContainer = async ({
-  shouldGenerate,
-  haikuDate,
-}: {
-  shouldGenerate: boolean;
-  haikuDate: Date;
-}) => {
-  const haikuList = await getOrCreateHaikus(
-    haikuDate,
-    shouldGenerate,
-    COUNT_HAIKU_GENERATED_DURING_BUILD,
-  );
+export const DayHaikuContainer = async ({ haikuDate }: { haikuDate: Date }) => {
+  const haikuList = await getHaikusForDay(haikuDate);
 
   if (haikuList.length === 0) {
     return (

@@ -1,8 +1,8 @@
-import { generateHaikusIfNeeded } from "@/utils/main";
+import { generateOneHaikuFromDate } from "@/utils/main";
 import { NextResponse } from "next/server";
 import dayjs from "dayjs";
 
-const HAIKUS_GENERATED_IN_ROUTE = 3;
+const HAIKUS_GENERATED_IN_ROUTE = 1;
 
 // Forcing the route to be revalidated on every request
 // TODO: Once stabilized, can increase the revalidation cache to a bit less than one day.
@@ -16,7 +16,7 @@ export async function GET(request: Request) {
     console.log(
       `Cron job started at ${date.format("YYYY-MM-DD HH:mm:ss")} - Haikus Generation`,
     );
-    await generateHaikusIfNeeded(date.toDate(), HAIKUS_GENERATED_IN_ROUTE);
+    await generateOneHaikuFromDate(date.toDate());
     return NextResponse.json(
       { status: "Success", date: date.format("YYYY-MM-DD HH:mm:ss") },
       { status: 200 },

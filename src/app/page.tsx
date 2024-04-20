@@ -25,7 +25,7 @@ export default function Home() {
       <HomeDisclaimer />
       <section>
         <Suspense fallback={<Spinner />}>
-          {<DayHaikuContainer shouldGenerate={true} haikuDate={todayDate} />}
+          {<DayHaikuContainer haikuDate={todayDate} />}
         </Suspense>
       </section>
       <DateSwitcher currentDate={todayDate} />

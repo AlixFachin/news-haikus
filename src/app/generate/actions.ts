@@ -35,10 +35,11 @@ export async function sa_generateHaiku(parameters: GenHaikuParameters) {
 export async function sa_saveHaikuInDB(haiku: Omit<Haiku, "id" | "userId">) {
   const { userId } = auth();
 
-  if (userId !== process.env.CLERK_ADMIN_ID) {
-    return { error: "You are not allowed to save haikus" };
+  if (!userId) {
+    return { error: "You need to be logged in in order to save haikus" };
   }
 
+  // TODO: Add a "try-catch" to handle errors and display corresponding description
   const savedHaiku = await storeHaikuInFirebase(haiku, userId);
   if (!savedHaiku) {
     return { error: "Error saving haiku" };
