@@ -7,14 +7,6 @@
         {
             "path": "/api/cron/generate",
             "schedule": "30 21 * * *"
-        },
-        {
-            "path": "/api/cron/generate",
-            "schedule": "30 22 * * *"
-        },
-        {
-            "path": "/api/cron/generate",
-            "schedule": "30 23 * * *"
         }
     ]
 }
