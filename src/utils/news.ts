@@ -39,7 +39,6 @@ export const getNewsFromAPI = async () => {
   const sections: { id: string; q?: string }[] = [
     { id: "world", q: "japan, China, Thailand, Korea" },
     { id: "news", q: "japan" },
-    { id: "lifeandstyle" },
     { id: "science" },
     { id: "arts" },
   ];
