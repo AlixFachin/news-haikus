@@ -1,3 +1,6 @@
+"use client";
+// This component should be a client side component to allow the date to be local to user's timezone
+
 import Link from "next/link";
 import dayjs from "dayjs";
 import { getDateFormatJapanTimeFromDayjs } from "@/utils/datetimeUtils";

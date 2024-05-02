@@ -8,15 +8,20 @@ import {
   getCountFromServer,
   query,
   where,
+  limit,
   addDoc,
   doc,
   getDoc,
   writeBatch,
+  orderBy,
 } from "firebase/firestore";
 import type { Haiku } from "@/utils/types";
 import { HaikuDBSchema } from "@/utils/types";
 import { createHash } from "crypto";
-import { getDateFormatJapanTime } from "@/utils/datetimeUtils";
+import {
+  getDateFormatJapanTime,
+  getDateFormatJapanTimeFromDayjs,
+} from "@/utils/datetimeUtils";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -83,6 +88,60 @@ export async function fetchHaikusFromFirebase(date: Date, userId: string) {
   });
 
   return result;
+}
+
+/**
+ * fetches from the database twice the amount of haikus that we need and return a random selection of those
+ * @param date date string in format YYYYMMDD - filter for the date query
+ * @param userId string or underfined - filter for the user query
+ * @param haikuLimit max number of haikus to be returned
+ */
+export async function fetchRandomHaikusFromFirebase(
+  date: Date,
+  userId: string | undefined,
+  haikuLimit: number,
+) {
+  const result: Haiku[] = [];
+  const dateKey = getDateFormatJapanTime(date);
+
+  const auth = getAuth(app);
+  if (!auth.currentUser) {
+    await loginToFirebase();
+  }
+
+  const db = getFirestore(app);
+  const q = userId
+    ? query(
+        collection(db, "haikus"),
+        where("date", "==", dateKey),
+        where("userId", "==", userId),
+        limit(haikuLimit * 2),
+      )
+    : query(
+        collection(db, "haikus"),
+        where("date", "==", dateKey),
+        limit(haikuLimit * 2),
+      );
+
+  const querySnapshot = await getDocs(q);
+
+  querySnapshot.forEach((doc) => {
+    const haiku = HaikuDBSchema.parse(doc.data());
+    result.push({ ...haiku, id: doc.id });
+  });
+
+  if (result.length <= haikuLimit) {
+    return result;
+  }
+
+  // Picking up random haikus from the list
+  // To make sure that we end up with the desired length, we attribute to each index a random number,
+  // sort according to this number and then pick the first elements.
+  const randomIndexes = Array(result.length)
+    .fill(0)
+    .map((_) => Math.floor(Math.random() * result.length));
+  randomIndexes.sort((a, b) => a - b);
+  return randomIndexes.slice(0, haikuLimit).map((index) => result[index]);
 }
 
 /**
@@ -237,6 +296,7 @@ export async function storeHaikuInFirebase(
 }
 
 import { newsSchemaType } from "./news";
+import { Dayjs } from "dayjs";
 
 type NewsArticle = newsSchemaType["results"][number] & { date: string };
 
@@ -267,15 +327,44 @@ export async function storeNewsInFirebase(newsList: NewsArticle[]) {
  * Fetches the news saved in the database for a given date
  * @param date the date at which we want to retrieve the news
  */
-export async function getNewsFromFirebase(date: Date) {
+export async function getNewsFromFirebase(date: Dayjs) {
   const auth = getAuth(app);
   if (!auth.currentUser) {
     await loginToFirebase();
   }
 
-  const dateKey = getDateFormatJapanTime(date);
+  const dateKey = getDateFormatJapanTimeFromDayjs(date);
   const db = getFirestore(app);
   const q = query(collection(db, "news"), where("date", "==", dateKey));
+
+  const result: NewsArticle[] = [];
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach((doc) => {
+    result.push(doc.data() as NewsArticle);
+  });
+  return result;
+}
+
+/**
+ * Fetches the given number of articles saved in the database up to the given date
+ * @param date upper limit of news date - in YYYYMMDD format
+ * @param count number of news to be returned
+ * @returns array of NewsArticles objects
+ */
+export async function getLatestNewsFromFirebase(date: Dayjs, count: number) {
+  const auth = getAuth(app);
+  if (!auth.currentUser) {
+    await loginToFirebase();
+  }
+
+  const dateKey = getDateFormatJapanTimeFromDayjs(date);
+  const db = getFirestore(app);
+  const q = query(
+    collection(db, "news"),
+    where("date", "<=", dateKey),
+    orderBy("date", "desc"),
+    limit(count),
+  );
 
   const result: NewsArticle[] = [];
   const querySnapshot = await getDocs(q);

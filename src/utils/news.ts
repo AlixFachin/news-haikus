@@ -102,7 +102,7 @@ export const getNewsFromAPI = async () => {
  */
 export const getNews = async () => {
   const todayDate = dayjs();
-  const newsInDB = await getNewsFromFirebase(todayDate.toDate());
+  const newsInDB = await getNewsFromFirebase(todayDate);
   if (newsInDB.length > 0) {
     console.log(
       `getNews: News already inside the DB, no need to download from API!`,

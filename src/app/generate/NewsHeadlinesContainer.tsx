@@ -1,9 +1,12 @@
-import { getNewsFromFirebase } from "@/utils/firebase";
+import {
+  getLatestNewsFromFirebase,
+  getNewsFromFirebase,
+} from "@/utils/firebase";
 import NewsItemCard from "./NewsItemCard";
 import dayjs from "dayjs";
 
 export const NewsHeadlinesContainer = async () => {
-  const newsInDB = await getNewsFromFirebase(dayjs().toDate());
+  const newsInDB = await getLatestNewsFromFirebase(dayjs(), 20);
 
   if (newsInDB.length === 0) {
     return <p>No news were saved for this day!</p>;
