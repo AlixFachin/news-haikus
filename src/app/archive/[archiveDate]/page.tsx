@@ -5,6 +5,7 @@ import Spinner from "@/components/Spinner";
 import dayjs from "dayjs";
 import { Metadata } from "next";
 import { RedirectType, redirect } from "next/navigation";
+import { getDateFormatJapanTimeFromDayjs } from "@/utils/datetimeUtils";
 
 // TODO -> Put in a higher value to avoid re-rendering the same page all over again
 export const revalidate = 0;
@@ -29,7 +30,7 @@ export default function ArchivePage({
   const archiveDate = dayjs(params.archiveDate);
 
   // If asking for today's date, we redirect to the home page
-  if (archiveDate.isSame(dayjs(), "day")) {
+  if (getDateFormatJapanTimeFromDayjs(dayjs()) === params.archiveDate) {
     redirect("/", RedirectType.replace);
     return;
   }
