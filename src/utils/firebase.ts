@@ -14,6 +14,7 @@ import {
   getDoc,
   writeBatch,
   orderBy,
+  deleteDoc,
 } from "firebase/firestore";
 import type { Haiku } from "@/utils/types";
 import { HaikuDBSchema } from "@/utils/types";
@@ -372,4 +373,19 @@ export async function getLatestNewsFromFirebase(date: Dayjs, count: number) {
     result.push(doc.data() as NewsArticle);
   });
   return result;
+}
+
+export async function deleteNewsFromFirebase(newsId: string) {
+  const auth = getAuth(app);
+  if (!auth.currentUser) {
+    await loginToFirebase();
+  }
+
+  const db = getFirestore(app);
+  const q = query(collection(db, "news"), where("id", "==", newsId));
+  const querySnapshot = await getDocs(q);
+  const doc = querySnapshot.docs.at(0);
+  if (doc) {
+    await deleteDoc(doc.ref);
+  }
 }

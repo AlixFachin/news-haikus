@@ -1,7 +1,7 @@
 "use server";
 
 import { generateHaiku } from "@/utils/haikuGenerator";
-import { storeHaikuInFirebase } from "@/utils/firebase";
+import { deleteNewsFromFirebase, storeHaikuInFirebase } from "@/utils/firebase";
 import type { Haiku, GenHaikuParameters } from "@/utils/types";
 import { GenerateParamSchema } from "@/utils/types";
 import { revalidatePath } from "next/cache";
@@ -46,4 +46,19 @@ export async function sa_saveHaikuInDB(haiku: Omit<Haiku, "id" | "userId">) {
   }
   revalidatePath("/", "page");
   return savedHaiku;
+}
+
+export async function sa_deleteNewsFromFB(newsId: string) {
+  const { userId } = auth();
+
+  if (!userId) {
+    return { error: "You need to be logged in in order to delete haikus" };
+  }
+
+  try {
+    await deleteNewsFromFirebase(newsId);
+    return { success: "News deleted" };
+  } catch (e) {
+    return { error: `Error deleting news: ${e}` };
+  }
 }

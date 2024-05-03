@@ -14,9 +14,7 @@ export default function GeneratePage() {
           on this headline.
         </p>
       </SummaryComponent>
-      <Suspense fallback={<Spinner />}>
-        <NewsHeadlinesContainer />
-      </Suspense>
+      <NewsHeadlinesContainer />
     </main>
   );
 }
