@@ -146,6 +146,37 @@ export async function fetchRandomHaikusFromFirebase(
 }
 
 /**
+ * Downloads from the database all the haikus for a given user (=Clerk UserId)
+ * @param userId string - the Clerk userId for which to fetch the haikus
+ * @returns the list of haikus for the given user
+ */
+export async function fetchHaikusFromFirebaseByUser(userId: string) {
+  const result: Haiku[] = [];
+  const auth = getAuth(app);
+  if (!auth.currentUser) {
+    await loginToFirebase();
+  }
+
+  const db = getFirestore(app);
+  const q = query(
+    collection(db, "haikus"),
+    where("userId", "==", userId),
+    orderBy("date", "desc"),
+  );
+
+  const querySnapshot = await getDocs(q);
+
+  querySnapshot.forEach((doc) => {
+    const haiku = HaikuDBSchema.parse(doc.data());
+    result.push({ ...haiku, id: doc.id });
+  });
+
+  return result;
+}
+
+
+
+/**
  * returns the number of haikus in a database for a given date
  * @param date the date for which to fetch the haikus
  * @param userId the user id for which to fetch the haikus, or undefined if we want to get count of all haikus for all users
@@ -294,6 +325,28 @@ export async function storeHaikuInFirebase(
     console.error(`Error storing haiku: ${JSON.stringify(haiku)}\nError: ${e}`);
     return undefined;
   }
+}
+
+/**
+ * Deletes one haiku from the database. Note: This function will check whether the user is an admin or if they have the right to delete the haiku
+ * @param haikuId the haikuID to be deleted
+ * @param userId the current user ID of the logged user
+ * @param isAdmin boolean indicating if the user is an admin, this will override the userId check
+ */
+export async function deleteHaikuFromFirebase(haikuId: string, userId: string, isAdmin: boolean) {
+  const auth = getAuth(app);
+  if (!auth.currentUser) {
+    await loginToFirebase();
+  }
+
+  const db = getFirestore(app);
+  const haikuDocRef = doc(db, "haikus", haikuId);
+  const haiku =  await getDoc(haikuDocRef);
+  const haikuData = HaikuDBSchema.parse(haiku.data());
+  if (!isAdmin && haikuData.userId !== userId) {
+    throw new Error("User does not have permission to delete this haiku");
+  }
+  await deleteDoc(haikuDocRef);
 }
 
 import { newsSchemaType } from "./news";

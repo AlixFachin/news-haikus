@@ -50,7 +50,7 @@ export default function NewsItemCard({ newsItem }: { newsItem: NewsItem }) {
             link
           </a>
         </div>
-        <Protect permission="org:news:delete">
+        <Protect role="org:admin">
           <div
             className="mx-4 rounded-lg bg-orange-500 px-4 py-2"
             onClick={handleDeleteNewsClick}

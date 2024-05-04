@@ -1,7 +1,7 @@
 import type { Haiku } from "@/utils/types";
 import dayjs from "dayjs";
-import { HaikuCard } from "./HaikuCard";
 import Link from "next/link";
+import { HaikuCard } from "./HaikuCard";
 
 import { Sawarabi_Mincho } from "next/font/google";
 

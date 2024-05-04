@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import dayjs from "dayjs";
 import Link from "next/link";
 import { Metadata } from "next";
+import BackButton from "./BackButton";
 
 /**
  * generateStaticParams is useful for generating static paths for all HaikuIDs.
@@ -78,12 +79,7 @@ export default async function HaikuDetailPage({
           </div>
         </div>
         <div className="flex w-full items-center justify-center">
-          <Link
-            href="/"
-            className="rounded-md bg-orange-300 p-2 text-sm shadow-sm dark:bg-blue-950"
-          >
-            Back
-          </Link>
+          <BackButton />
         </div>
       </section>
     </main>

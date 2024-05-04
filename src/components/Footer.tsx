@@ -17,7 +17,7 @@ export const Footer = () => {
             <Link href="/generate">Generate Haikus</Link>{" "}
           </p>
           <p>
-            <Link href="/myhaikus">My haikus</Link>
+            <Link href="/myHaikus">My haikus</Link>
           </p>
         </div>
         <div className="flex flex-col items-center justify-evenly">

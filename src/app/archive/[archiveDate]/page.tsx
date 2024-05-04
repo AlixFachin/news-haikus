@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { DayHaikuContainer } from "@/components/HaikuContainer";
+import { DayHaikuContainer } from "@/components/DayHaikuContainer";
 import DateSwitcher from "@/components/DateSwitcher";
 import Spinner from "@/components/Spinner";
 import dayjs from "dayjs";
