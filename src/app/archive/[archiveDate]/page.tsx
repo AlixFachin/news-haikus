@@ -29,12 +29,6 @@ export default function ArchivePage({
 }) {
   const archiveDate = dayjs(params.archiveDate);
 
-  // If asking for today's date, we redirect to the home page
-  if (getDateFormatJapanTimeFromDayjs(dayjs()) === params.archiveDate) {
-    redirect("/", RedirectType.replace);
-    return;
-  }
-
   return (
     <main className="flex min-h-screen flex-col flex-wrap items-center justify-evenly sm:p-4 xl:p-24">
       <h1 className="mb-4 text-4xl font-bold sm:text-6xl md:mb-8">
