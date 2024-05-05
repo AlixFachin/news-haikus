@@ -1,0 +1,29 @@
+name: protect-pr
+on: [pull_request]
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+    env:
+        NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
+        GUARDIAN_API_KEY: ${{ secrets.GUARDIAN_API_KEY }}
+        GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        FIREBASE_USER: ${{ secrets.FIREBASE_USER }}
+        FIREBASE_PWD: ${{ secrets.FIREBASE_PWD }}
+        FIREBASE_UID: ${{ secrets.FIREBASE_UID }}
+        CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+        ADMIN_USER_ID: ${{ secrets.ADMIN_USER_ID }}
+        # The next line is public and maybe should not be stored as a secret
+        # TODO: Clean it later - figure out the best way to store ENV variables without
+        # hard-coding them in the action code
+        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+        MAX_USER_HAIKU_A_DAY: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        with:
+            build: npm run build
+            start: npm run start
