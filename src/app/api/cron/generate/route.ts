@@ -11,12 +11,17 @@ export const revalidate = 0;
 
 export async function GET(request: Request) {
   // We will call the function which creates the haikus
+  const t0 = performance.now();
   try {
     const date = dayjs();
     console.log(
       `Cron job started at ${date.format("YYYY-MM-DD HH:mm:ss")} - Haikus Generation`,
     );
     await generateOneHaikuFromDate(date.toDate());
+    const t1 = performance.now();
+    console.log(
+      `Haikus generation in Cron job finished in ${t1 - t0} milliseconds`,
+    );
     return NextResponse.json(
       { status: "Success", date: date.format("YYYY-MM-DD HH:mm:ss") },
       { status: 200 },

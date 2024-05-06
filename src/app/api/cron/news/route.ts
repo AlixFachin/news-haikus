@@ -10,11 +10,17 @@ export const revalidate = 0;
 export async function GET(request: Request) {
   // We will call the function which creates the haikus
   try {
+    
+    let t0 = performance.now();
     const date = dayjs();
     console.log(
       `Cron job started at ${date.format("YYYY-MM-DD HH:mm:ss")} - News Download`,
     );
     const newsList = await getNews();
+    let t1 = performance.now();
+    console.log(
+      `News download + write in Cron job finished in ${t1 - t0} milliseconds`,
+    );
     return NextResponse.json(
       {
         status: "Success",
