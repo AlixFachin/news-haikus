@@ -15,6 +15,10 @@ import {
   writeBatch,
   orderBy,
   deleteDoc,
+  startAt,
+  startAfter,
+  endAt,
+  endBefore,
 } from "firebase/firestore";
 import type { Haiku } from "@/utils/types";
 import { HaikuDBSchema } from "@/utils/types";
@@ -92,60 +96,6 @@ export async function fetchHaikusFromFirebase(date: Date, userId: string) {
 }
 
 /**
- * fetches from the database twice the amount of haikus that we need and return a random selection of those
- * @param date date string in format YYYYMMDD - filter for the date query
- * @param userId string or underfined - filter for the user query
- * @param haikuLimit max number of haikus to be returned
- */
-export async function fetchRandomHaikusFromFirebase(
-  date: Date,
-  userId: string | undefined,
-  haikuLimit: number,
-) {
-  const result: Haiku[] = [];
-  const dateKey = getDateFormatJapanTime(date);
-
-  const auth = getAuth(app);
-  if (!auth.currentUser) {
-    await loginToFirebase();
-  }
-
-  const db = getFirestore(app);
-  const q = userId
-    ? query(
-        collection(db, "haikus"),
-        where("date", "==", dateKey),
-        where("userId", "==", userId),
-        limit(haikuLimit * 2),
-      )
-    : query(
-        collection(db, "haikus"),
-        where("date", "==", dateKey),
-        limit(haikuLimit * 2),
-      );
-
-  const querySnapshot = await getDocs(q);
-
-  querySnapshot.forEach((doc) => {
-    const haiku = HaikuDBSchema.parse(doc.data());
-    result.push({ ...haiku, id: doc.id });
-  });
-
-  if (result.length <= haikuLimit) {
-    return result;
-  }
-
-  // Picking up random haikus from the list
-  // To make sure that we end up with the desired length, we attribute to each index a random number,
-  // sort according to this number and then pick the first elements.
-  const randomIndexes = Array(result.length)
-    .fill(0)
-    .map((_) => Math.floor(Math.random() * result.length));
-  randomIndexes.sort((a, b) => a - b);
-  return randomIndexes.slice(0, haikuLimit).map((index) => result[index]);
-}
-
-/**
  * Downloads from the database all the haikus for a given user (=Clerk UserId)
  * @param userId string - the Clerk userId for which to fetch the haikus
  * @returns the list of haikus for the given user
@@ -173,8 +123,6 @@ export async function fetchHaikusFromFirebaseByUser(userId: string) {
 
   return result;
 }
-
-
 
 /**
  * returns the number of haikus in a database for a given date
@@ -204,6 +152,82 @@ export async function fetchHaikuCountFromFirebase(
   const haikuCount = await getCountFromServer(q);
   return haikuCount.data().count;
 }
+
+/**
+ * Main pagination function for the haiku fetch and display function
+ * NOTE: This pagination is not stable regarding database mutations
+ * it is better to use a cursor pagination to get more stable results.
+ * TODO: Implement cursor pagination, the issue being to store the cursor across pages.
+ * @param startIndex first haiku index
+ * @param pageSize number of haikus returned.
+ */
+export async function fetchHaikuPageFromFirebase(
+  beforeId: string | undefined,
+  afterId: string | undefined,
+  pageSize: number,
+) {
+  const result: Haiku[] = [];
+
+  const auth = getAuth(app);
+  if (!auth.currentUser) {
+    await loginToFirebase();
+  }
+  const db = getFirestore(app);
+
+  // The previous page is the MAX of the haikus before the first ID
+  // The next page is the MIN of the haikus after the last ID.
+
+  let q;
+  if (beforeId) {
+    const beforeDoc = await getDoc(doc(db, "haikus", beforeId));
+    q = query(
+      collection(db, "haikus"),
+      orderBy("date", "asc"),
+      orderBy("__name__", "asc"),
+      startAfter(beforeDoc),
+      limit(pageSize),
+    );
+  } else if (afterId) {
+    const afterDoc = await getDoc(doc(db, "haikus", afterId));
+    q = query(
+      collection(db, "haikus"),
+      orderBy("date", "desc"),
+      orderBy("__name__", "desc"),
+      startAfter(afterDoc),
+      limit(pageSize),
+    );
+  } else {
+    q = query(
+      collection(db, "haikus"),
+      orderBy("date", "desc"),
+      orderBy("__name__", "desc"),
+      limit(pageSize),
+    );
+  }
+  const querySnapshot = await getDocs(q);
+  console.log(
+    `beforeId=${beforeId}, afterId=${afterId}, QuerySnapshot size: ${querySnapshot.size}`,
+  );
+  querySnapshot.forEach((doc) => {
+    const haiku = HaikuDBSchema.parse(doc.data());
+    console.log(`Found haiku: ${JSON.stringify(haiku)}`);
+    result.push({ ...haiku, id: doc.id });
+  });
+
+  // We have to sort the result in the right order (case of beforeID where the query was the opposite order)
+  if (beforeId) {
+    result.sort((a, b) => {
+      if (a.date === b.date) {
+        return b.id.localeCompare(a.id);
+      }
+      return b.date.localeCompare(a.date);
+    });
+  }
+
+  return result;
+}
+
+
 
 export async function fetchOneHaikuFromFirebase(haikuId: string) {
   const auth = getAuth(app);

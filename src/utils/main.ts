@@ -11,11 +11,8 @@
  * 4. Return today's haikus
  */
 
-import dayjs from "dayjs";
 import {
   fetchHaikuCountFromFirebase,
-  fetchHaikusFromFirebase,
-  fetchRandomHaikusFromFirebase,
   loginToFirebase,
   storeHaikusInFirebase,
 } from "./firebase";
@@ -102,22 +99,6 @@ async function generateHaikuList(date: Date, count: number) {
   });
 
   return EnrichedHaikusList;
-}
-
-/**
- * Fetches today's haikus from the database if they were already generated
- * If not, will generate today's haikus and store them in the database
- * @param date the date for which we want to generate the haikus
- * @returns {Promise<Haiku[]>} The list of haikus generated
- */
-export async function getHaikusForDay(date: Date) {
-  await loginToFirebase();
-
-  const todayHaikus = await fetchRandomHaikusFromFirebase(date, undefined, 3);
-  console.log(
-    `getOrCreateHaikus: Checking haiku DB State for ${date.toISOString()}`,
-  );
-  return todayHaikus;
 }
 
 /**

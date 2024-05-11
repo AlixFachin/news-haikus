@@ -5,7 +5,6 @@ import {
 } from "@/utils/firebase";
 import { notFound } from "next/navigation";
 import dayjs from "dayjs";
-import Link from "next/link";
 import { Metadata } from "next";
 import BackButton from "./BackButton";
 

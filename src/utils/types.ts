@@ -42,4 +42,3 @@ export const GenerateParamSchema = zod.object({
 });
 
 export type GenHaikuParameters = zod.infer<typeof GenerateParamSchema>;
-  
