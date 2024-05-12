@@ -1,13 +1,13 @@
 "use server";
 
 import { deleteHaikuFromFirebase } from "@/utils/firebase";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 export async function sa_deleteHaiku(haikuId: string) {
   const { userId, has } = auth();
 
   if (!userId) {
-    return { error: "You need to be logged in to generate haikus" };
+    return { error: "You need to be logged in to delete haikus" };
   }
 
   try {

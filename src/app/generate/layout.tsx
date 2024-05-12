@@ -4,7 +4,6 @@
 "use client";
 
 import AppMenu from "@/components/AppMenu";
-import UserActionsBox from "@/components/UserActions";
 import {
   ClerkProvider,
   SignInButton,

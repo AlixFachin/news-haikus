@@ -6,7 +6,7 @@ import type { Haiku, GenHaikuParameters } from "@/utils/types";
 import { GenerateParamSchema } from "@/utils/types";
 import { revalidatePath } from "next/cache";
 
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 export async function sa_generateHaiku(parameters: GenHaikuParameters) {
   const { userId } = auth();

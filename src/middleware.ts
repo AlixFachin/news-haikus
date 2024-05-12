@@ -1,7 +1,14 @@
-import { authMiddleware } from "@clerk/nextjs";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-export default authMiddleware({
-  publicRoutes: ["((?!^/admin).*)", "/api/cron/news", "/api/cron/generate"],
+const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
+
+export default clerkMiddleware((auth, req) => {
+  // TODO: Protect other routes for admin access
+  if (isAdminRoute(req)) {
+    auth().protect({ role: "org:admin" });
+  }
+
+  // TODO: Check if API routes can be protected as well
 });
 
 export const config = {
