@@ -1,7 +1,7 @@
 "use client";
 import HaikuList from "./HaikuList";
 import type { Haiku } from "@/utils/types";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { sa_fetchHaikus } from "@/app/actions";
 import Spinner from "./Spinner";
 
@@ -13,6 +13,8 @@ export default function HaikuScrollContainer() {
   // The haikuList will contain the list of haikus, sorted in DESC order
   const [haikuList, setHaikuList] = useState<Haiku[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasMoreHaikus, setHasMoreHaikus] = useState(true);
+  const observerTarget = useRef(null);
 
   useEffect(() => {
     setIsLoading(true);
@@ -27,7 +29,7 @@ export default function HaikuScrollContainer() {
     });
   }, []);
 
-  const loadMoreHaikus = () => {
+  const loadMoreHaikus = useCallback(() => {
     if (haikuList.length === 0) {
       setIsLoading(true);
       sa_fetchHaikus(undefined).then((haikus) => {
@@ -41,9 +43,7 @@ export default function HaikuScrollContainer() {
       });
       return;
     }
-
     // Load the first batch of haikus on initial re-render
-
     const lastHaiku = haikuList[haikuList.length - 1];
     setIsLoading(true);
     sa_fetchHaikus(lastHaiku.id).then((haikus) => {
@@ -52,26 +52,42 @@ export default function HaikuScrollContainer() {
         console.error(haikus.error);
         return;
       }
+      if (haikus.length === 0) {
+        setHasMoreHaikus(false);
+      }
       // concat method returns a new array so it will trigger a re-render
       setHaikuList(haikuList.concat(haikus));
     });
-  };
+  }, [haikuList]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMoreHaikus) {
+          loadMoreHaikus();
+        }
+      },
+      { threshold: 1.0 },
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    const component = observerTarget.current;
+
+    return () => {
+      if (component) {
+        observer.unobserve(component);
+      }
+    };
+  }, [observerTarget, loadMoreHaikus, hasMoreHaikus]);
 
   return (
     <section className="flex w-full flex-col items-center">
       <HaikuList haikus={haikuList} orientation="Grid" />
-      {isLoading ? (
-        <Spinner />
-      ) : (
-        <div className="my-4 flex w-full items-center justify-center rounded-lg bg-orange-200 p-4 dark:bg-blue-900">
-          <button
-            className="rounded-lg bg-orange-500 p-2 shadow-sm md:p-4 dark:bg-blue-500"
-            onClick={loadMoreHaikus}
-          >
-            Display More Haikus
-          </button>
-        </div>
-      )}
+      {isLoading && <Spinner />}
+      <div ref={observerTarget}></div>
     </section>
   );
 }
