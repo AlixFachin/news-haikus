@@ -12,18 +12,18 @@ describe("Visiting homepage", () => {
     cy.contains("This website is a hobby project").should("not.exist");
   });
 
-  it("Testing the archive navigation", () => {
-    cy.visit("http://localhost:3000", {
+  it("Visiting other pages - basic test", () => {
+    cy.request({
+      url: "http://localhost:3000/zorglub",
       failOnStatusCode: false,
-      timeout: 10000,
+    }).then((response) => {
+      expect(response.status).to.eq(401);
     });
 
-    // Click on the previous button - we should switch to the archive page
-    cy.get("[data-cy=date-switcher-previous]").click();
-    cy.url().should("include", "/archive");
-    cy.contains("Haikus for");
-    // Click on the next button - we should come back to the home page
-    cy.get("[data-cy=date-switcher-next]").click();
-    cy.url().should("eq", "http://localhost:3000/");
+    cy.visit("http://localhost:3000/about", { failOnStatusCode: false });
+    cy.contains("About this app");
+
+    // TODO: Simulate login and logout with Clerk.js
+    // in order to test the admin and MyHaikus pages
   });
 });

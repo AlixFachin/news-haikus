@@ -1,6 +1,7 @@
 import { HomeDisclaimer } from "@/components/HomeDisclaimer";
 import { Metadata } from "next";
 import HaikuScrollContainer from "@/components/HaikuScrollContainer";
+import AppMenu from "@/components/AppMenu";
 
 // Meta-Data
 export const metadata: Metadata = {
@@ -15,6 +16,7 @@ export default function Home() {
       </h1>
       <HomeDisclaimer />
       <HaikuScrollContainer />
+      <AppMenu displayUserButton={false} />
     </main>
   );
 }

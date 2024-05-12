@@ -10,7 +10,11 @@ import {
 
 import Link from "next/link";
 
-export default function AppMenu() {
+export default function AppMenu({
+  displayUserButton,
+}: {
+  displayUserButton: boolean;
+}) {
   const [opened, setOpened] = useState(false);
 
   return (
@@ -33,18 +37,25 @@ export default function AppMenu() {
             <li className="mb-2">
               <Link href="/">Home</Link>
             </li>
+            <li className="mb-2">
+              <Link href="/about">About</Link>
+            </li>
           </ul>
-          <hr className="mb-2 w-full"></hr>
-          <SignedIn>
-            <SignOutButton>
-              <button className="mb-2">Log Out</button>
-            </SignOutButton>
-          </SignedIn>
-          <SignedOut>
-            <SignInButton>
-              <button className="mb-2">Log In</button>
-            </SignInButton>
-          </SignedOut>
+          {displayUserButton && (
+            <>
+              <hr className="mb-2 w-full"></hr>
+              <SignedIn>
+                <SignOutButton>
+                  <button className="mb-2">Log Out</button>
+                </SignOutButton>
+              </SignedIn>
+              <SignedOut>
+                <SignInButton>
+                  <button className="mb-2">Log In</button>
+                </SignInButton>
+              </SignedOut>
+            </>
+          )}
         </div>
       )}
     </div>

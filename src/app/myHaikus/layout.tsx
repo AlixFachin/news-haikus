@@ -3,7 +3,7 @@
 
 "use client";
 
-import UserActionsBox from "@/components/UserActions";
+import AppMenu from "@/components/AppMenu";
 import {
   ClerkProvider,
   SignInButton,
@@ -32,12 +32,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </SignedOut>
-      <SignedIn>
-        {children}
-        <div className="from:orange-200 fixed bottom-4 right-4 rounded-[50%] bg-gradient-to-tl to-orange-300 p-4 text-white dark:from-blue-900 dark:to-blue-700">
-          <UserActionsBox />
-        </div>
-      </SignedIn>
+      <SignedIn>{children}</SignedIn>
+      <AppMenu displayUserButton={true} />
     </ClerkProvider>
   );
 }

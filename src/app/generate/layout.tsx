@@ -3,6 +3,7 @@
 
 "use client";
 
+import AppMenu from "@/components/AppMenu";
 import UserActionsBox from "@/components/UserActions";
 import {
   ClerkProvider,
@@ -15,7 +16,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider>
       <SignedOut>
-        <div className="left-0 top-0 h-dvh w-screen">
+        <div className="left-0 top-0 h-dvh w-screen bg-transparent">
           {
             // This is to get a regular background
           }
@@ -32,12 +33,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </SignedOut>
-      <SignedIn>
-        {children}
-        <div className="from:orange-200 fixed bottom-4 right-4 rounded-[50%] bg-gradient-to-tl to-orange-300 p-4 text-white dark:from-blue-900 dark:to-blue-700">
-          <UserActionsBox />
-        </div>
-      </SignedIn>
+      <SignedIn>{children}</SignedIn>
+      <AppMenu displayUserButton={true} />
     </ClerkProvider>
   );
 }
