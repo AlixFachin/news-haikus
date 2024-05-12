@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import AppMenu from "@/components/AppMenu";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,7 +24,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className + " text-gray-800 dark:text-white"}>
         {children}
-        <AppMenu />
+        <ClerkProvider>
+          <AppMenu />
+        </ClerkProvider>
         <Footer />
         <Analytics />
       </body>

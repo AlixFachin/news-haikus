@@ -16,7 +16,6 @@ export const LandscapeHaikuBox = ({ haikuData }: { haikuData: Haiku }) => {
           console.error(res.error);
           return;
         }
-        console.log("Deleted", haikuData.id);
         router.refresh();
       })
       .catch((err) => console.error(err));

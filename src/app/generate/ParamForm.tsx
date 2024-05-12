@@ -28,7 +28,6 @@ export const GenParamForm = ({ handleGenHaikuClick }: GenParamFormProps) => {
     },
   });
   const onSubmit: SubmitHandler<GenHaikuParameters> = (data) => {
-    console.log(`On submit handler\n${data}`);
     handleGenHaikuClick({
       topK: data.topK,
       topP: data.topP,

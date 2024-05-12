@@ -8,9 +8,6 @@ export const Footer = () => {
           <p>
             <Link href="/">Today&apos;s Haiku</Link>{" "}
           </p>
-          <p>
-            <Link href="/archive">Haiku Archive</Link>
-          </p>
         </div>
         <div className="flex flex-col items-center justify-evenly">
           <p>

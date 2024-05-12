@@ -1,6 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import {
+  SignInButton,
+  SignOutButton,
+  SignedIn,
+  SignedOut,
+} from "@clerk/nextjs";
+
 import Link from "next/link";
 
 export default function AppMenu() {
@@ -24,12 +31,20 @@ export default function AppMenu() {
               <Link href="/myHaikus">My Haikus</Link>
             </li>
             <li className="mb-2">
-              <Link href="/archive">Archive</Link>
-            </li>
-            <li className="mb-2">
               <Link href="/">Home</Link>
             </li>
           </ul>
+          <hr className="mb-2 w-full"></hr>
+          <SignedIn>
+            <SignOutButton>
+              <button className="mb-2">Log Out</button>
+            </SignOutButton>
+          </SignedIn>
+          <SignedOut>
+            <SignInButton>
+              <button className="mb-2">Log In</button>
+            </SignInButton>
+          </SignedOut>
         </div>
       )}
     </div>
