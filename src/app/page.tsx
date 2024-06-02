@@ -3,6 +3,8 @@ import { Metadata } from "next";
 import HaikuScrollContainer from "@/components/HaikuScrollContainer";
 import AppMenu from "@/components/AppMenu";
 
+export const revalidate = 3600; // Revalidate every hour
+
 // Meta-Data
 export const metadata: Metadata = {
   title: "AI-Generated Haikus of the day",

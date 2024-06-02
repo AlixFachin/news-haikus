@@ -1,25 +1,38 @@
 "use client";
 
 import type { Haiku } from "@/utils/types";
+import { useState } from "react";
 import dayjs from "dayjs";
 import Link from "next/link";
 import { sa_deleteHaiku } from "@/app/myHaikus/actions";
 import { useRouter } from "next/navigation";
+import Spinner from "./Spinner";
+import { set } from "firebase/database";
 
 export const LandscapeHaikuBox = ({ haikuData }: { haikuData: Haiku }) => {
+  const [deleteInProgress, setDeleteInProgress] = useState(false);
   const router = useRouter();
 
   const delButtonHandler = () => {
+    setDeleteInProgress(true);
     sa_deleteHaiku(haikuData.id)
       .then((res) => {
         if (res?.error) {
           console.error(res.error);
           return;
         }
+        setDeleteInProgress(false);
         router.refresh();
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error(err);
+        setDeleteInProgress(false);
+      });
   };
+
+  if (deleteInProgress) {
+    return <Spinner />;
+  }
 
   return (
     <div
@@ -33,12 +46,12 @@ export const LandscapeHaikuBox = ({ haikuData }: { haikuData: Haiku }) => {
         <div className="truncate">{haikuData.articleTitle}</div>
       </Link>
       <div className="flex-grow"></div>
-      <div
+      <button
         className="mx-4 self-center rounded-lg bg-orange-500 px-4 py-2 dark:bg-blue-800"
         onClick={delButtonHandler}
       >
         Del
-      </div>
+      </button>
     </div>
   );
 };

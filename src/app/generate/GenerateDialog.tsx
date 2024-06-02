@@ -4,7 +4,6 @@ import { sa_generateHaiku, sa_saveHaikuInDB } from "./actions";
 import { useState } from "react";
 import { useTransition } from "react";
 import SmallHaikuCard from "./SmallHaikuCard";
-import dayjs from "dayjs";
 import Spinner from "@/components/Spinner";
 import type { Haiku } from "@/utils/types";
 import { GenParamForm } from "./ParamForm";
@@ -23,9 +22,10 @@ export default function GenerateDialog({
   const [haikuEn, setHaikuEn] = useState<string>("");
   const [haikuError, setHaikuError] = useState<string>("");
   const [genPending, startGenTransition] = useTransition();
-  const [savePending, startSaveTransition] = useTransition();
+  const [isSavingHaiku, setIsSavingHaiku] = useState(false);
 
   const handleGenHaikuClick = async (options: GenHaikuParameters) => {
+    clearHaiku();
     // We will use a Transition to show a spinner while the haiku is being generated
     startGenTransition(async () => {
       const haiku = await sa_generateHaiku(options);
@@ -50,20 +50,25 @@ export default function GenerateDialog({
     setHaikuError("");
   };
 
-  const saveHaiku: (
-    haiku: Omit<Haiku, "id" | "userId">,
-  ) => Promise<void> = async (haiku) => {
-    startSaveTransition(async () => {
-      const savedHaiku = await sa_saveHaikuInDB(haiku);
-      if (!savedHaiku || "error" in savedHaiku) {
-        setHaikuError(
-          `Error saving haiku : ${savedHaiku?.error || "Unknown error"}`,
-        );
-        return;
-      }
-      setHaikuText("");
-      setHaikuError("");
-    });
+  const saveHaiku: (haiku: Omit<Haiku, "id" | "userId">) => void = async (
+    haiku,
+  ) => {
+    setIsSavingHaiku(true);
+    sa_saveHaikuInDB(haiku)
+      .then((savedHaiku) => {
+        if (!savedHaiku || "error" in savedHaiku) {
+          setHaikuError(
+            `Error saving haiku : ${savedHaiku?.error || "Unknown error"}`,
+          );
+          return;
+        }
+        setHaikuText("");
+        setHaikuError("");
+      })
+      .catch((error) => {
+        setHaikuError(`Error saving haiku : ${error || "Unknown error"}`);
+      })
+      .finally(() => setIsSavingHaiku(false));
   };
 
   return (
@@ -87,7 +92,7 @@ export default function GenerateDialog({
             }
           />
           <div className="flex flex-col items-center justify-center">
-            {genPending && <Spinner />}
+            {(genPending || isSavingHaiku) && <Spinner />}
             {haikuError && <p className="text-orange-700">{haikuError}</p>}
             {!haikuError && haikuText != "" && (
               <SmallHaikuCard
