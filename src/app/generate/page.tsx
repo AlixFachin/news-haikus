@@ -1,11 +1,9 @@
-import { Suspense } from "react";
 import { NewsHeadlinesContainer } from "./NewsHeadlinesContainer";
-import Spinner from "@/components/Spinner";
 import { SummaryComponent } from "@/components/SummaryComponent";
 
 export default function GeneratePage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-evenly p-24">
+    <main className="flex min-h-screen flex-col items-center justify-evenly sm:p-4 xl:p-24">
       <h1 className="text-6xl font-bold">Today&apos;s News</h1>
       <SummaryComponent title="Help">
         <p className="p-2 md:p-4">
