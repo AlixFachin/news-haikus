@@ -23,7 +23,7 @@
     "@vercel/analytics": "^1.2.2",
     "dayjs": "^1.11.10",
     "firebase": "^10.8.1",
-    "next": "^14.2.3",
+    "next": "^14.2.22",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.51.2",
