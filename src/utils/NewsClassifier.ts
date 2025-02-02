@@ -26,7 +26,7 @@ export const extractTopicFromTitles = async (
 ): Promise<TopicDataArray> => {
   const generativeAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
   const model = await generativeAI.getGenerativeModel({
-    model: "gemini-pro",
+    model: "gemini-1.5-flash",
     generationConfig: {
       temperature: 0.9,
       topK: 5,

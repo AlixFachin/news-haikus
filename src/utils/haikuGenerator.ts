@@ -22,7 +22,7 @@ export const generateHaiku = async (options: GenHaikuParameters) => {
   const modelTopP = options.topP || 0.8;
 
   const model = await generativeAI.getGenerativeModel({
-    model: "gemini-pro",
+    model: "gemini-1.5-flash",
     generationConfig: {
       temperature: modelTemperature,
       topK: modelTopK,
